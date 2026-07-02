@@ -1,0 +1,55 @@
+{
+  "name": "Celeste Creative Director Workspace",
+  "short_name": "Celeste OS",
+  "description": "HueVine Creative Director — Daily execution board, content engine builder, automation review hub, and publishing tracker.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "landscape-primary",
+  "background_color": "#080808",
+  "theme_color": "#e0637a",
+  "lang": "en-US",
+  "categories": ["productivity", "business"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Today's Top 3",
+      "short_name": "Top 3",
+      "description": "Jump straight to today's priority tasks",
+      "url": "/?section=top3",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Work Queue",
+      "short_name": "Queue",
+      "description": "Open the full work queue",
+      "url": "/?section=queue",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Automation Review",
+      "short_name": "Review",
+      "description": "Review automation outputs before publishing",
+      "url": "/?section=auto-review",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

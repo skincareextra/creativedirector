@@ -1,0 +1,2950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#e0637a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Celeste OS">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="Celeste OS">
+<meta name="msapplication-TileColor" content="#080808">
+<meta name="description" content="HueVine Creative Director Workspace — daily execution, content engines, automation review, publishing tracker.">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+<title>Celeste — Creative Director Workspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080808;--surface:#0f0f0f;--card:#141414;--card-hi:#1c1c1c;
+  --border:#202020;--border-hi:#2a2a2a;
+  --accent:#e0637a;--accent-dim:rgba(224,99,122,.10);--accent-glow:rgba(224,99,122,.22);
+  --gold:#c9a670;--gold-dim:rgba(201,166,112,.10);
+  --text:#eeeeee;--text-mid:#a8a8a8;--text-muted:#686868;
+  --green:#34d399;--green-dim:rgba(52,211,153,.10);
+  --yellow:#fbbf24;--yellow-dim:rgba(251,191,36,.10);
+  --red:#f87171;--red-dim:rgba(248,113,113,.10);
+  --blue:#60a5fa;--blue-dim:rgba(96,165,250,.10);
+  --r:8px;--r-lg:12px;--r-xl:16px;
+  --sb:222px;--hh:52px;
+  --font:"Space Grotesk",system-ui,sans-serif;
+  --mono:"JetBrains Mono",monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.5;font-weight:500}
+button{font-family:var(--font);cursor:pointer;border:none;outline:none}
+input,select,textarea{font-family:var(--font);font-size:13px;font-weight:500;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:var(--r);padding:6px 10px;outline:none;transition:border-color .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+select option{background:var(--card)}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-hi);border-radius:4px}
+#app{display:grid;grid-template-rows:var(--hh) 1fr;grid-template-columns:var(--sb) 1fr;height:100vh}
+/* HEADER */
+header{grid-column:1/-1;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 20px;z-index:100}
+.brand{font-weight:700;font-size:12px;color:var(--text-muted);white-space:nowrap;letter-spacing:.06em;text-transform:uppercase}
+.brand em{color:var(--accent);font-style:normal}
+.focus-bar{flex:1;display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:5px 12px;cursor:pointer;transition:border-color .2s;max-width:520px}
+.focus-bar:hover{border-color:var(--border-hi)}
+.focus-bar.running{border-color:var(--accent);background:var(--accent-dim)}
+.focus-bar.paused{border-color:var(--yellow);background:var(--yellow-dim)}
+.focus-bar.blocked{border-color:var(--red);background:var(--red-dim)}
+.focus-bar.complete{border-color:var(--green);background:var(--green-dim)}
+#hdr-time{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--text);min-width:46px}
+#hdr-label{font-size:12px;color:var(--text-mid);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#hdr-btn{font-size:11px;font-weight:700;padding:3px 10px;background:var(--accent);color:#fff;border-radius:6px;transition:opacity .2s,transform .1s;white-space:nowrap}
+#hdr-btn:hover{opacity:.85}
+#hdr-btn:active{transform:scale(.97)}
+#hdr-count{font-size:11px;color:var(--text-muted);font-family:var(--mono);white-space:nowrap}
+.hdr-right{display:flex;align-items:center;gap:10px;margin-left:auto}
+.user-tag{font-size:11px;font-weight:600;color:var(--text-muted);background:var(--card);border:1px solid var(--border);border-radius:20px;padding:3px 10px;white-space:nowrap;letter-spacing:.04em}
+.save-dot{width:6px;height:6px;border-radius:50%;background:var(--green);opacity:0;transition:opacity .3s}
+.save-dot.show{opacity:1}
+/* SIDEBAR */
+nav{background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:10px 0 24px}
+.nav-section-label{font-size:10px;font-weight:700;letter-spacing:.09em;color:var(--text-muted);text-transform:uppercase;padding:12px 16px 4px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 16px;font-size:13px;font-weight:600;color:var(--text-mid);cursor:pointer;border-left:2px solid transparent;transition:all .15s;user-select:none}
+.nav-item:hover{color:var(--text);background:rgba(255,255,255,.03)}
+.nav-item.active{color:var(--accent);border-left-color:var(--accent);background:var(--accent-dim)}
+.nav-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;opacity:.4}
+.nav-item.active .nav-dot{opacity:1}
+.nav-rule{height:1px;background:var(--border);margin:8px 14px}
+/* MAIN */
+main{overflow-y:auto;background:var(--bg)}
+.section{display:none;padding:28px 30px;min-height:100%}
+.section.active{display:block}
+/* PAGE HEADER */
+.ph{margin-bottom:22px}
+.ph h1{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.01em}
+.ph p{font-size:13px;color:var(--text-mid);margin-top:4px;font-weight:500}
+/* BENTO GRID */
+.bento{display:grid;gap:10px}
+.b2{grid-template-columns:repeat(2,1fr)}
+.b3{grid-template-columns:repeat(3,1fr)}
+.b4{grid-template-columns:repeat(4,1fr)}
+.b5{grid-template-columns:repeat(5,1fr)}
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px}
+.card-label{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px}
+.card-val{font-size:28px;font-weight:700;line-height:1;font-family:var(--mono)}
+.card-val.accent{color:var(--accent)}
+.card-val.green{color:var(--green)}
+.card-val.yellow{color:var(--yellow)}
+.card-val.red{color:var(--red)}
+.card-val.gold{color:var(--gold)}
+.card-sub{font-size:11px;color:var(--text-muted);margin-top:4px}
+/* ACTION BUTTONS */
+.action-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}
+.abtn{padding:14px 16px;border-radius:var(--r-lg);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s var(--ease);border:1px solid transparent;text-align:left;line-height:1.3}
+.abtn:active{transform:scale(.98)}
+.abtn-primary{background:var(--accent);color:#fff}
+.abtn-primary:hover{opacity:.9}
+.abtn-secondary{background:var(--card);border-color:var(--border);color:var(--text)}
+.abtn-secondary:hover{border-color:var(--border-hi);background:var(--card-hi)}
+.abtn-gold{background:var(--gold-dim);border-color:var(--gold);color:var(--gold)}
+.abtn-gold:hover{background:rgba(201,166,112,.18)}
+.abtn-title{font-size:13px}
+.abtn-sub{font-size:11px;opacity:.6;font-weight:400;margin-top:2px}
+/* SECTION BLOCKS */
+.sb{margin-bottom:24px}
+.stitle{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-mid);margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid var(--border)}
+/* TABLES */
+.tw{overflow-x:auto;border-radius:var(--r-lg);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead{background:var(--card)}
+th{text-align:left;padding:8px 11px;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:7px 11px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text);font-weight:500}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--card)}
+td input,td select,td textarea{width:100%;border:none;background:transparent;padding:0;font-size:13px;min-width:70px}
+td input:focus,td select:focus{background:var(--card-hi);padding:2px 4px;border-radius:4px}
+.rank-cell{color:var(--text-muted);font-family:var(--mono);font-size:12px;text-align:center;width:32px}
+.del{background:none;color:var(--text-muted);font-size:13px;padding:2px 5px;border-radius:4px;line-height:1}
+.del:hover{color:var(--red);background:var(--red-dim)}
+/* ADD ROW */
+.add-btn{margin-top:9px;font-size:12px;font-weight:600;padding:7px 14px;background:transparent;border:1px dashed var(--border-hi);color:var(--text-muted);border-radius:var(--r);transition:all .15s;width:100%;cursor:pointer}
+.add-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+/* BADGES */
+.badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.04em;padding:2px 7px;border-radius:20px;white-space:nowrap}
+.bg{background:var(--green-dim);color:var(--green)}
+.by{background:var(--yellow-dim);color:var(--yellow)}
+.br{background:var(--red-dim);color:var(--red)}
+.bb{background:var(--blue-dim);color:var(--blue)}
+.bgold{background:var(--gold-dim);color:var(--gold)}
+.baccent{background:var(--accent-dim);color:var(--accent)}
+.bmuted{background:var(--card-hi);color:var(--text-muted)}
+/* FORM FIELDS */
+.fg{margin-bottom:14px}
+.fl{font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:4px;display:block;letter-spacing:.05em;text-transform:uppercase}
+.fi{width:100%;padding:8px 11px;font-size:13px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);color:var(--text)}
+.fi:focus{border-color:var(--accent);outline:none}
+.fr{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+textarea.fi{min-height:72px;resize:vertical;line-height:1.5}
+/* TIMER */
+.timer-display{text-align:center;padding:36px 24px;background:var(--card);border:1px solid var(--border);border-radius:var(--r-xl);margin-bottom:18px}
+.timer-clock{font-family:var(--mono);font-size:68px;font-weight:700;color:var(--text);line-height:1;letter-spacing:-2px;transition:color .3s}
+.timer-clock.running{color:var(--accent)}
+.timer-clock.paused{color:var(--yellow)}
+.timer-clock.blocked{color:var(--red)}
+.timer-clock.complete{color:var(--green)}
+.timer-state-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-top:8px}
+.timer-task-label{font-size:15px;color:var(--text-mid);margin-top:10px;min-height:22px}
+.timer-sessions{font-size:12px;color:var(--text-muted);margin-top:5px;font-family:var(--mono)}
+.timer-presets{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+.preset{padding:5px 13px;font-size:12px;font-weight:600;border-radius:20px;background:var(--card);border:1px solid var(--border);color:var(--text-muted);cursor:pointer;transition:all .15s}
+.preset:hover,.preset.sel{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+.timer-btns{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-bottom:16px}
+.tbtn{padding:9px 16px;font-size:13px;font-weight:600;border-radius:var(--r);transition:all .15s var(--ease)}
+.tbtn:active{transform:scale(.97)}
+.tbtn-go{background:var(--accent);color:#fff}
+.tbtn-go:hover{opacity:.88}
+.tbtn-muted{background:var(--card-hi);border:1px solid var(--border-hi);color:var(--text-mid)}
+.tbtn-muted:hover{color:var(--text)}
+.tbtn-warn{background:var(--yellow-dim);border:1px solid var(--yellow);color:var(--yellow)}
+.tbtn-success{background:var(--green-dim);border:1px solid var(--green);color:var(--green)}
+.tbtn-danger{background:var(--red-dim);border:1px solid var(--red);color:var(--red)}
+/* AFTER SESSION CHOICES */
+.after-choices{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:16px}
+.after-btn{padding:9px 12px;font-size:11px;font-weight:600;border-radius:var(--r);background:var(--card);border:1px solid var(--border);color:var(--text-mid);cursor:pointer;transition:all .15s;text-align:center;line-height:1.3}
+.after-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+/* WEEKLY BLOCKS */
+.week-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.day-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px}
+.day-name{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.day-theme{font-size:13px;font-weight:700;color:var(--text);margin-bottom:5px}
+.day-desc{font-size:11px;color:var(--text-muted);margin-bottom:10px;line-height:1.5}
+.day-tasks{list-style:none}
+.day-tasks li{font-size:11px;color:var(--text-mid);padding:4px 0;border-top:1px solid var(--border)}
+.day-tasks li:first-child{border-top:none}
+/* RULES + INFO BOXES */
+.rule-box{background:var(--accent-dim);border:1px solid var(--accent);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--accent);margin-bottom:16px;font-weight:500;line-height:1.5}
+.info-box{background:var(--blue-dim);border:1px solid var(--blue);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--blue);margin-bottom:16px;line-height:1.5}
+.gold-box{background:var(--gold-dim);border:1px solid var(--gold);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--gold);margin-bottom:16px;line-height:1.5}
+/* GATE BANNER */
+.gate-banner{background:var(--accent-dim);border:1px solid var(--accent);border-radius:var(--r-lg);padding:14px 16px;margin-bottom:18px}
+.gate-title{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px;letter-spacing:.04em;text-transform:uppercase}
+.gate-pills{display:flex;flex-wrap:wrap;gap:5px}
+.gate-pill{font-size:10px;font-weight:600;background:var(--accent);color:#fff;border-radius:20px;padding:2px 9px}
+/* MANDATE */
+.mandate{text-align:center;padding:48px 32px;border-top:1px solid var(--border);margin-top:36px;color:var(--text-muted);font-size:14px;line-height:2}
+.mandate strong{color:var(--text-mid);display:block;font-size:16px;margin-bottom:4px}
+/* ENGINE STARTER CARDS */
+.engine-starter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px}
+.engine-starter{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px;cursor:pointer;transition:border-color .2s}
+.engine-starter:hover{border-color:var(--accent)}
+.es-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.es-meta{font-size:11px;color:var(--text-muted);margin-bottom:8px;line-height:1.5}
+.es-action{font-size:11px;font-weight:600;color:var(--accent)}
+/* SOCIAL GROWTH */
+.sg-goal-banner{background:linear-gradient(135deg,rgba(224,99,122,.12) 0%,rgba(201,166,112,.08) 100%);border:1px solid var(--accent);border-radius:var(--r-xl);padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.sg-goal-text{font-size:13px;color:var(--text-mid)}
+.sg-goal-title{font-size:18px;font-weight:700;color:var(--accent);margin-bottom:4px}
+.sg-goal-sub{font-size:12px;color:var(--text-muted)}
+.sg-10x-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:20px}
+.sg-10x-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;position:relative;overflow:hidden}
+.sg-10x-card::after{content:'';position:absolute;bottom:0;left:0;height:3px;background:var(--accent);width:var(--prog,0%);transition:width .6s var(--ease)}
+.sg-10x-platform{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px}
+.sg-10x-current{font-size:26px;font-weight:700;font-family:var(--mono);color:var(--text);line-height:1}
+.sg-10x-goal{font-size:11px;color:var(--text-muted);margin-top:3px}
+.sg-10x-pct{font-size:12px;font-weight:700;color:var(--accent);margin-top:6px}
+.sg-10x-proj{font-size:10px;color:var(--text-muted);margin-top:2px}
+.sg-week-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.sg-week-tab{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;background:var(--card);border:1px solid var(--border);color:var(--text-muted);cursor:pointer;transition:all .15s}
+.sg-week-tab:hover,.sg-week-tab.active{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+.sg-new-week-btn{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;background:var(--accent);color:#fff;cursor:pointer;transition:opacity .15s;border:none}
+.sg-new-week-btn:hover{opacity:.88}
+.sg-platform-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;margin-bottom:20px}
+.sg-platform-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+.sg-plat-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sg-plat-name{font-size:12px;font-weight:700;color:var(--text);letter-spacing:.04em}
+.sg-plat-change{font-size:11px;font-weight:700;font-family:var(--mono)}
+.sg-plat-change.up{color:var(--green)}
+.sg-plat-change.down{color:var(--red)}
+.sg-plat-change.flat{color:var(--text-muted)}
+.sg-plat-fields{display:grid;grid-template-columns:repeat(2,1fr)}
+.sg-plat-field{padding:10px 14px;border-bottom:1px solid var(--border)}
+.sg-plat-field:nth-child(odd){border-right:1px solid var(--border)}
+.sg-plat-field:last-child,.sg-plat-field:nth-last-child(2):nth-child(odd){border-bottom:none}
+.sg-plat-label{font-size:10px;font-weight:600;color:var(--text-muted);margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em}
+.sg-plat-input{width:100%;background:transparent;border:none;color:var(--text);font-size:13px;font-family:var(--mono);padding:0;outline:none}
+.sg-plat-input:focus{background:var(--card-hi);padding:2px 4px;border-radius:4px}
+.sg-what-working{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;margin-bottom:20px}
+.sg-ww-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.sg-ww-panel{padding:12px;border-radius:var(--r);background:var(--surface)}
+.sg-ww-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:6px}
+.sg-ww-input{width:100%;background:transparent;border:none;color:var(--text);font-size:12px;resize:none;outline:none;height:70px;line-height:1.5}
+.sg-analyze-btn{padding:9px 18px;background:var(--accent);color:#fff;border-radius:var(--r-lg);font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s;border:none}
+.sg-analyze-btn:hover{opacity:.88}
+.sg-analyze-btn:disabled{opacity:.4;cursor:default}
+.sg-analysis-result{display:none;background:var(--card);border:1px solid var(--border);border-radius:var(--r-xl);padding:20px;margin-top:12px;font-size:13px;color:var(--text);line-height:1.7}
+.sg-analysis-result.show{display:block}
+.sg-history-table tbody tr td:first-child{font-family:var(--mono);font-size:12px;color:var(--text-muted)}
+@media(max-width:900px){
+  .sg-platform-grid{grid-template-columns:1fr}
+  .sg-10x-grid{grid-template-columns:repeat(2,1fr)}
+  .sg-ww-grid{grid-template-columns:1fr}
+}
+/* PROJECTS */
+.prj-grid{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.prj-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;transition:border-color .2s}
+.prj-card:hover{border-color:var(--border-hi)}
+.prj-card.prj-asap{border-left:3px solid var(--red)}
+.prj-card.prj-high{border-left:3px solid var(--yellow)}
+.prj-card.prj-medium{border-left:3px solid var(--blue)}
+.prj-card.prj-low{border-left:3px solid var(--text-muted)}
+.prj-header{padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none;background:var(--card)}
+.prj-header:hover{background:var(--card-hi)}
+.prj-chevron{font-size:10px;color:var(--text-muted);transition:transform .2s;min-width:12px}
+.prj-card.open .prj-chevron{transform:rotate(90deg)}
+.prj-name-block{flex:1;min-width:0}
+.prj-name{font-size:15px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prj-sub{font-size:11px;color:var(--text-mid);margin-top:2px;font-weight:500}
+.prj-meta{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.prj-due{font-size:11px;font-weight:700;font-family:var(--mono);padding:3px 8px;border-radius:20px;background:var(--surface);border:1px solid var(--border)}
+.prj-due.overdue{background:var(--red-dim);border-color:var(--red);color:var(--red)}
+.prj-due.soon{background:var(--yellow-dim);border-color:var(--yellow);color:var(--yellow)}
+.prj-due.ok{color:var(--text-mid)}
+.prj-status-badge{font-size:10px;font-weight:800;padding:3px 9px;border-radius:20px;letter-spacing:.04em}
+.prj-status-active{background:var(--green-dim);color:var(--green)}
+.prj-status-blocked{background:var(--red-dim);color:var(--red)}
+.prj-status-review{background:var(--yellow-dim);color:var(--yellow)}
+.prj-status-done{background:var(--surface);color:var(--text-muted)}
+.prj-export-btns{display:flex;gap:6px}
+.prj-export-btn{font-size:10px;font-weight:700;padding:4px 10px;border-radius:var(--r);border:1px solid var(--border);background:var(--surface);color:var(--text-mid);cursor:pointer;transition:all .15s;white-space:nowrap;font-family:var(--font)}
+.prj-export-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+.prj-export-btn.cursor-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-dim)}
+.prj-del-btn{font-size:12px;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:2px 6px;border-radius:var(--r);opacity:.5}
+.prj-del-btn:hover{opacity:1;color:var(--red)}
+.prj-body{display:none;padding:0 18px 16px;border-top:1px solid var(--border)}
+.prj-card.open .prj-body{display:block}
+.prj-fields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:14px 0}
+.prj-field-wrap{display:flex;flex-direction:column;gap:4px}
+.prj-field-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted)}
+.prj-field-input{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:6px 10px;color:var(--text);font-size:12px;font-weight:500;font-family:var(--font);outline:none;width:100%;transition:border-color .15s}
+.prj-field-input:focus{border-color:var(--accent)}
+.prj-field-input.full{grid-column:1/-1}
+.prj-tasks-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.prj-task-list{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.prj-task-row{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--surface);border-radius:var(--r);border:1px solid var(--border);transition:all .15s}
+.prj-task-row.done-task{opacity:.5}
+.prj-task-row.done-task .prj-task-text{text-decoration:line-through;color:var(--text-muted)}
+.prj-task-check{width:14px;height:14px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.prj-task-text{flex:1;font-size:13px;font-weight:500;color:var(--text);background:transparent;border:none;outline:none;font-family:var(--font)}
+.prj-task-pri{font-size:9px;font-weight:800;padding:2px 6px;border-radius:10px;flex-shrink:0}
+.prj-task-del{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:11px;padding:0 4px;opacity:.4;transition:opacity .15s}
+.prj-task-del:hover{opacity:1;color:var(--red)}
+.prj-add-task-row{display:flex;gap:6px;margin-top:6px}
+.prj-add-task-input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:6px 10px;color:var(--text);font-size:12px;font-weight:500;font-family:var(--font);outline:none}
+.prj-add-task-input:focus{border-color:var(--accent)}
+.prj-add-task-input::placeholder{color:var(--text-muted)}
+.prj-add-task-btn{padding:6px 12px;background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);border-radius:var(--r);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap}
+.prj-add-task-btn:hover{background:var(--accent);color:#fff}
+.prj-progress-bar{height:3px;background:var(--surface);border-radius:3px;margin:8px 0 12px;overflow:hidden}
+.prj-progress-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .3s var(--ease)}
+.prj-copy-toast{display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--green);border-radius:var(--r-lg);padding:10px 20px;font-size:13px;font-weight:600;color:var(--green);z-index:9999;white-space:nowrap}
+.prj-copy-toast.show{display:block;animation:toastpop .2s var(--ease)}
+@keyframes toastpop{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+/* RESOURCE DROPS */
+.rd-input-area{background:var(--card);border:1px solid var(--border);border-radius:var(--r-xl);padding:24px;margin-bottom:20px}
+.rd-url-row{display:flex;gap:10px;margin-bottom:12px}
+.rd-url-input{flex:1;padding:10px 14px;font-size:14px;background:var(--surface);border:1px solid var(--border-hi);border-radius:var(--r-lg);color:var(--text)}
+.rd-url-input:focus{border-color:var(--accent);outline:none}
+.rd-url-input::placeholder{color:var(--text-muted)}
+.rd-analyze-btn{padding:10px 20px;background:var(--accent);color:#fff;border-radius:var(--r-lg);font-size:13px;font-weight:700;white-space:nowrap;transition:all .2s}
+.rd-analyze-btn:hover{opacity:.88}
+.rd-analyze-btn:disabled{opacity:.4;cursor:default}
+.rd-context{width:100%;padding:8px 12px;background:var(--surface);border:1px solid var(--border-hi);border-radius:var(--r);color:var(--text);font-size:13px;resize:none;height:60px}
+.rd-context:focus{border-color:var(--accent);outline:none}
+.rd-context::placeholder{color:var(--text-muted)}
+.rd-thinking{display:none;align-items:center;gap:10px;padding:14px;background:var(--accent-dim);border:1px solid var(--accent);border-radius:var(--r-lg);margin-bottom:16px;font-size:13px;color:var(--accent);font-weight:600}
+.rd-thinking.show{display:flex}
+.rd-pulse{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:rdpulse 1.2s ease-in-out infinite}
+@keyframes rdpulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.rd-result{display:none;background:var(--card);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;margin-bottom:20px}
+.rd-result.show{display:block}
+.rd-result-header{background:var(--accent-dim);border-bottom:1px solid var(--accent);padding:14px 18px;display:flex;align-items:center;justify-content:space-between}
+.rd-result-title{font-size:14px;font-weight:700;color:var(--accent)}
+.rd-result-url{font-size:11px;color:var(--text-muted);font-family:var(--mono);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rd-fields{display:grid;grid-template-columns:repeat(2,1fr);gap:0}
+.rd-field{padding:14px 18px;border-bottom:1px solid var(--border)}
+.rd-field:nth-child(odd){border-right:1px solid var(--border)}
+.rd-field-label{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px}
+.rd-field-value{font-size:13px;color:var(--text);line-height:1.5}
+.rd-field.full{grid-column:1/-1;border-right:none}
+.rd-rec{padding:14px 18px;background:var(--green-dim);border-top:1px solid var(--green)}
+.rd-rec-label{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--green);margin-bottom:4px}
+.rd-rec-value{font-size:13px;color:var(--green);font-weight:600}
+.rd-save-btn{margin-top:12px;padding:9px 18px;background:var(--card-hi);border:1px solid var(--border-hi);color:var(--text-mid);border-radius:var(--r);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.rd-save-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+.rd-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
+.rd-badge-explore{background:var(--blue-dim);color:var(--blue)}
+.rd-badge-test{background:var(--yellow-dim);color:var(--yellow)}
+.rd-badge-add{background:var(--green-dim);color:var(--green)}
+.rd-badge-skip{background:var(--red-dim);color:var(--red)}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  :root{--sb:0px}
+  nav{display:none}
+  #app{grid-template-columns:1fr}
+  .b4,.b5{grid-template-columns:repeat(2,1fr)}
+  .b3{grid-template-columns:repeat(2,1fr)}
+  .week-grid{grid-template-columns:1fr}
+  .action-grid{grid-template-columns:1fr}
+}
+
+/* PWA INSTALL + OFFLINE */
+#pwa-install-btn{display:none;align-items:center;gap:6px;padding:4px 10px;background:var(--accent-dim);border:1px solid var(--accent);border-radius:20px;color:var(--accent);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;font-family:var(--font)}
+#pwa-install-btn:hover{background:var(--accent);color:#fff}
+.pwa-offline-dot{width:6px;height:6px;border-radius:50%;background:var(--red);display:none}
+.pwa-offline-dot.offline{display:inline-block}
+
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- HEADER -->
+<header>
+  <div class="brand">Celeste <em>/</em> HueVine</div>
+  <div class="focus-bar" id="focus-bar" onclick="showSection('focus')" title="Open Focus Timer">
+    <span id="hdr-time">25:00</span>
+    <span id="hdr-label">No active focus</span>
+    <button id="hdr-btn" onclick="event.stopPropagation();timerToggle()">Start</button>
+    <span id="hdr-count">0 sessions</span>
+  </div>
+  <div class="hdr-right">
+    <div class="save-dot" id="save-dot" title="Saved"></div>
+    <div class="user-tag">Creative Director</div>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<nav>
+  <div class="nav-section-label">Command</div>
+  <div class="nav-item active" onclick="showSection('dashboard')"><span class="nav-dot"></span>Dashboard</div>
+  <div class="nav-item" onclick="showSection('top3')"><span class="nav-dot"></span>Today's Top 3</div>
+  <div class="nav-item" onclick="showSection('focus')"><span class="nav-dot"></span>Focus Timer</div>
+  <div class="nav-item" onclick="showSection('queue')"><span class="nav-dot"></span>Work Queue</div>
+  <div class="nav-item" onclick="showSection('projects')"><span class="nav-dot"></span>Projects</div>
+  <div class="nav-rule"></div>
+  <div class="nav-section-label">Intake &amp; Engines</div>
+  <div class="nav-item" onclick="showSection('slp')"><span class="nav-dot"></span>SLP Intake</div>
+  <div class="nav-item" onclick="showSection('engine-builder')"><span class="nav-dot"></span>Engine Builder</div>
+  <div class="nav-item" onclick="showSection('engine-library')"><span class="nav-dot"></span>Engine Library</div>
+  <div class="nav-rule"></div>
+  <div class="nav-section-label">Automation</div>
+  <div class="nav-item" onclick="showSection('auto-engines')"><span class="nav-dot"></span>Automation Engines</div>
+  <div class="nav-item" onclick="showSection('auto-review')"><span class="nav-dot"></span>Automation Review</div>
+  <div class="nav-item" onclick="showSection('resource-drops')"><span class="nav-dot"></span>Resource Drops</div>
+  <div class="nav-rule"></div>
+  <div class="nav-section-label">Distribute</div>
+  <div class="nav-item" onclick="showSection('publish')"><span class="nav-dot"></span>Publish / Schedule</div>
+  <div class="nav-item" onclick="showSection('metrics')"><span class="nav-dot"></span>Metrics + Next Moves</div>
+  <div class="nav-item" onclick="showSection('social-growth')"><span class="nav-dot"></span>Social Growth</div>
+  <div class="nav-item" onclick="showSection('archive')"><span class="nav-dot"></span>Archive + Templates</div>
+  <div class="nav-rule"></div>
+  <div class="nav-section-label">Rhythm &amp; Reports</div>
+  <div class="nav-item" onclick="showSection('timeblocks')"><span class="nav-dot"></span>Weekly Time Blocks</div>
+  <div class="nav-item" onclick="showSection('report')"><span class="nav-dot"></span>Daily Report</div>
+  <div class="nav-item" onclick="showSection('danielle')"><span class="nav-dot"></span>Needs Danielle</div>
+  <div class="nav-rule"></div>
+  <div class="nav-section-label">Reference</div>
+  <div class="nav-item" onclick="showSection('how-to-use')"><span class="nav-dot"></span>How To Use</div>
+</nav>
+
+<!-- MAIN -->
+<main id="main">
+<div class="section active" id="sec-dashboard">
+  <div class="ph">
+    <h1>Good morning, Celeste</h1>
+    <p>Command center for today. Start with the Top 3, then set your focus.</p>
+  </div>
+  <div class="action-grid">
+    <button class="abtn abtn-primary" onclick="showSection('top3')">
+      <div class="abtn-title">Start Today's Top 3</div>
+      <div class="abtn-sub">Set what moves the needle today</div>
+    </button>
+    <button class="abtn abtn-secondary" onclick="showSection('focus')">
+      <div class="abtn-title">Start Focus Session</div>
+      <div class="abtn-sub">Lock in a Pomodoro block</div>
+    </button>
+    <button class="abtn abtn-secondary" onclick="showSection('auto-review')">
+      <div class="abtn-title">Review Automation Outputs</div>
+      <div class="abtn-sub">Approve before anything ships</div>
+    </button>
+    <button class="abtn abtn-gold" onclick="showSection('engine-builder')">
+      <div class="abtn-title">Build or Improve an Engine</div>
+      <div class="abtn-sub">Turn one idea into many outputs</div>
+    </button>
+  </div>
+  <div class="sb">
+    <div class="stitle">Today's Status</div>
+    <div class="bento b5">
+      <div class="card">
+        <div class="card-label">Top 3 Progress</div>
+        <div class="card-val accent" id="dash-top3">0/3</div>
+        <div class="card-sub">completed today</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Focus Sessions</div>
+        <div class="card-val" id="dash-sessions">0</div>
+        <div class="card-sub">pomodoros today</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Awaiting Review</div>
+        <div class="card-val yellow" id="dash-review">0</div>
+        <div class="card-sub">automation outputs</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Ready to Publish</div>
+        <div class="card-val green" id="dash-publish">0</div>
+        <div class="card-sub">approved + queued</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Blocked</div>
+        <div class="card-val red" id="dash-blocked">0</div>
+        <div class="card-sub">needs info or decision</div>
+      </div>
+    </div>
+  </div>
+  <div class="bento b3" style="margin-bottom:20px">
+    <div class="card">
+      <div class="card-label">Current Focus</div>
+      <div id="dash-focus-task" style="font-size:13px;color:var(--text-muted)">No active session</div>
+      <div id="dash-focus-time" style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--accent);margin-top:6px">--:--</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Engine Being Built This Week</div>
+      <div id="dash-engine-week" style="font-size:13px;color:var(--text-muted)">None in progress. Open Engine Builder to start one.</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Completed This Week</div>
+      <div class="card-val green" id="dash-week-done">0</div>
+      <div class="card-sub">tasks marked Done</div>
+    </div>
+  </div>
+  <div class="mandate">
+    <strong>The goal is not more manual content.</strong>
+    The goal is more repeatable creative machines.
+  </div>
+</div>
+<div class="section" id="sec-top3">
+  <div class="ph">
+    <h1>Today's Top 3</h1>
+    <p>Three tasks. Ranked. Done before the queue opens.</p>
+  </div>
+  <div class="rule-box">Celeste starts with the Top 3 before moving to the rest of the queue. These three tasks move the needle today.</div>
+  <div class="tw">
+    <table>
+      <thead><tr>
+        <th style="width:32px">#</th><th>Task</th><th>Campaign</th><th>Work Type</th><th>Priority</th><th>Time Block</th><th>Pomodoros</th><th>Status</th><th>Next Step</th><th>Due Date</th><th>Link</th><th>Notes</th><th></th>
+      </tr></thead>
+      <tbody id="top3-body"></tbody>
+    </table>
+  </div>
+  <button class="add-btn" onclick="addTop3Row()">+ Add Task</button>
+</div>
+<div class="section" id="sec-focus">
+  <div class="ph">
+    <h1>Focus Timer</h1>
+    <p>Creative Flow Active. No task gets unlimited time.</p>
+  </div>
+  <div class="bento b2">
+    <div>
+      <div class="timer-display" id="timer-display">
+        <div class="timer-clock" id="timer-clock">25:00</div>
+        <div class="timer-state-label" id="timer-state-label">Not Started</div>
+        <div class="timer-task-label" id="timer-task-label"></div>
+        <div class="timer-sessions" id="timer-sessions">0 sessions completed today</div>
+      </div>
+      <div class="timer-presets">
+        <button class="preset sel" data-mins="25" onclick="setPreset(this,25)">25 min sprint</button>
+        <button class="preset" data-mins="50" onclick="setPreset(this,50)">50 min deep work</button>
+        <button class="preset" data-mins="90" onclick="setPreset(this,90)">90 min creative flow</button>
+      </div>
+      <div class="timer-btns">
+        <button class="tbtn tbtn-go" id="t-start" onclick="timerToggle()">Start Focus</button>
+        <button class="tbtn tbtn-muted" onclick="timerReset()">Reset</button>
+        <button class="tbtn tbtn-warn" onclick="timerBlock()">Mark Blocked</button>
+        <button class="tbtn tbtn-success" onclick="timerFinish()">Complete Session</button>
+      </div>
+      <div class="stitle" style="margin-top:16px">After This Session</div>
+      <div class="rule-box">When a focus block ends, choose one action below.</div>
+      <div class="after-choices">
+        <button class="after-btn" onclick="goAfter('auto-review')">Automation Review</button>
+        <button class="after-btn" onclick="goAfter('publish')">Publish / Schedule</button>
+        <button class="after-btn" onclick="goAfter('archive')">Archive</button>
+        <button class="after-btn" onclick="goAfter('queue')">Next Task</button>
+        <button class="after-btn" onclick="goAfter('top3')">Back to Top 3</button>
+        <button class="after-btn" onclick="timerReset()">Pause for Now</button>
+      </div>
+    </div>
+    <div>
+      <div class="stitle">Current Session</div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="fg">
+          <label class="fl">Task Name</label>
+          <input class="fi" id="timer-task" type="text" placeholder="What are you working on?">
+        </div>
+        <div class="fr">
+          <div class="fg">
+            <label class="fl">Focus Mode</label>
+            <select class="fi" id="timer-mode">
+              <option>Quick Sprint</option>
+              <option>Deep Work</option>
+              <option>Creative Flow</option>
+              <option>Admin Cleanup</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label class="fl">Planned Minutes</label>
+            <input class="fi" id="timer-planned" type="number" placeholder="25">
+          </div>
+        </div>
+        <div class="fr">
+          <div class="fg">
+            <label class="fl">Start Time</label>
+            <input class="fi" id="timer-start-time" type="time" readonly>
+          </div>
+          <div class="fg">
+            <label class="fl">Stop Time</label>
+            <input class="fi" id="timer-stop-time" type="time" readonly>
+          </div>
+        </div>
+        <div class="fg">
+          <label class="fl">Break Needed?</label>
+          <select class="fi" id="timer-break"><option>No</option><option>Yes</option></select>
+        </div>
+        <div class="fg">
+          <label class="fl">What Got Done</label>
+          <textarea class="fi" id="timer-done" rows="2" placeholder="Progress summary..."></textarea>
+        </div>
+        <div class="fg">
+          <label class="fl">What Blocked Progress</label>
+          <textarea class="fi" id="timer-blocker" rows="2" placeholder="Any blockers..."></textarea>
+        </div>
+        <div class="fg">
+          <label class="fl">Next Step</label>
+          <input class="fi" id="timer-next" type="text" placeholder="What happens after this block?">
+        </div>
+      </div>
+      <div class="stitle">Session Log</div>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Task</th><th>Mode</th><th>Mins</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody id="session-log"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="section" id="sec-queue">
+  <div class="ph">
+    <h1>Work Queue</h1>
+    <p>All active tasks. In Progress is a status, not a separate tab.</p>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+    <select id="queue-filter" onchange="filterQueue()" style="font-size:12px;padding:5px 10px">
+      <option value="all">All Statuses</option>
+      <option>Not Started</option><option>In Progress</option><option>Blocked</option>
+      <option>Automation Review</option><option>Ready to Publish</option>
+      <option>Scheduled</option><option>Published</option><option>Done</option><option>Archived</option>
+    </select>
+  </div>
+  <div class="tw">
+    <table>
+      <thead><tr>
+        <th>Task</th><th>Campaign</th><th>Work Type</th><th>Priority</th><th>Status</th><th>Time Block</th><th>Poms</th><th>Next Step</th><th>Due</th><th>Source Link</th><th>Final Asset</th><th>Assigned To</th><th>Notes</th><th></th>
+      </tr></thead>
+      <tbody id="queue-body"></tbody>
+    </table>
+  </div>
+  <button class="add-btn" onclick="addQueueRow()">+ Add Task</button>
+</div>
+<div class="section" id="sec-slp">
+  <div class="ph">
+    <h1>SLP Intake</h1>
+    <p>Danielle drops SLPs, briefs, and Drive links here for Celeste to action.</p>
+  </div>
+  <div class="tw">
+    <table>
+      <thead><tr>
+        <th>SLP Name</th><th>Drive Link</th><th>Campaign</th><th>Source Type</th><th>Assets Needed</th><th>Work Type</th><th>Priority</th><th>Deadline</th><th>Missing Info</th><th>Ready?</th><th>Status</th><th>Become Engine?</th><th>Engine Type</th><th></th>
+      </tr></thead>
+      <tbody id="slp-body"></tbody>
+    </table>
+  </div>
+  <button class="add-btn" onclick="addSLPRow()">+ Add SLP</button>
+</div>
+<div class="section" id="sec-engine-builder">
+  <div class="ph">
+    <h1>Content Engine Builder</h1>
+    <p>One source input. Multiple outputs. Metrics decide what gets repeated.</p>
+  </div>
+  <div class="rule-box">A content engine means: one source input creates multiple useful outputs across platforms. Metrics decide whether to repeat, revise, stop, or template it.</div>
+  <div class="stitle">Quick-Load Starter Engines</div>
+  <div class="engine-starter-grid">
+    <div class="engine-starter" onclick="loadEngine(0)">
+      <div class="es-name">HueVine Illustration Style Engine</div>
+      <div class="es-meta">Input: 30 existing graphics &rarr; new matching illustrations, captions, story slides, carousel covers</div>
+      <div class="es-action">Load into builder &rarr;</div>
+    </div>
+    <div class="engine-starter" onclick="loadEngine(1)">
+      <div class="es-name">Product Education Engine</div>
+      <div class="es-meta">Input: product SLP &rarr; graphic, reel script, caption, email, SMS, Pinterest pin</div>
+      <div class="es-action">Load into builder &rarr;</div>
+    </div>
+    <div class="engine-starter" onclick="loadEngine(2)">
+      <div class="es-name">Service Explainer Engine</div>
+      <div class="es-meta">Input: service topic &rarr; carousel, reel script, FAQ post, email, website blurb</div>
+      <div class="es-action">Load into builder &rarr;</div>
+    </div>
+    <div class="engine-starter" onclick="loadEngine(3)">
+      <div class="es-name">Client Proof Engine</div>
+      <div class="es-meta">Input: review or testimonial &rarr; quote graphic, reel cover, caption, carousel, email proof</div>
+      <div class="es-action">Load into builder &rarr;</div>
+    </div>
+    <div class="engine-starter" onclick="loadEngine(4)">
+      <div class="es-name">Metrics-to-Next-Batch Engine</div>
+      <div class="es-meta">Input: platform metrics &rarr; next content tasks based on what performed</div>
+      <div class="es-action">Load into builder &rarr;</div>
+    </div>
+    <div class="engine-starter" onclick="loadEngine(5)">
+      <div class="es-name">Longform-to-Shortform Engine</div>
+      <div class="es-meta">Input: YouTube, podcast, transcript &rarr; clips, reels, carousels, email tips</div>
+      <div class="es-action">Load into builder &rarr;</div>
+    </div>
+    <div class="engine-starter" onclick="loadEngine(6)">
+      <div class="es-name">Campaign Kit Engine</div>
+      <div class="es-meta">Input: one campaign SLP &rarr; hero graphic, reel, stories, email, SMS, Pinterest, landing banner, CTA</div>
+      <div class="es-action">Load into builder &rarr;</div>
+    </div>
+  </div>
+  <div class="stitle">Engine Details</div>
+  <div class="bento b2">
+    <div class="card">
+      <div class="fg"><label class="fl">Engine Name</label><input class="fi" id="eb-name" type="text" placeholder="e.g. Product Education Engine"></div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Status</label>
+          <select class="fi" id="eb-status"><option>Idea</option><option>Testing</option><option>Working</option><option>Needs Fix</option><option>Parked</option><option>Retired</option></select>
+        </div>
+        <div class="fg"><label class="fl">Last Tested</label><input class="fi" id="eb-tested" type="date"></div>
+      </div>
+      <div class="fg"><label class="fl">Goal</label><input class="fi" id="eb-goal" type="text" placeholder="What does this engine produce?"></div>
+      <div class="fg"><label class="fl">Source Input</label><textarea class="fi" id="eb-source" rows="2" placeholder="SLP, product, testimonial, transcript, graphic..."></textarea></div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Audience</label><input class="fi" id="eb-audience" type="text" placeholder="Who is this for?"></div>
+        <div class="fg"><label class="fl">Offer / Service / Product</label><input class="fi" id="eb-offer" type="text" placeholder="What is being promoted?"></div>
+      </div>
+      <div class="fg"><label class="fl">Output Types</label><input class="fi" id="eb-outputs" type="text" placeholder="Caption, graphic, reel script, email, SMS..."></div>
+      <div class="fg"><label class="fl">Platforms</label><input class="fi" id="eb-platforms" type="text" placeholder="Instagram, TikTok, Email, SMS, Pinterest..."></div>
+    </div>
+    <div class="card">
+      <div class="fg"><label class="fl">AI / Automation Tool</label><input class="fi" id="eb-tool" type="text" placeholder="ChatGPT Images, Claude, n8n, Canva..."></div>
+      <div class="fg"><label class="fl">Prompt / Process</label><textarea class="fi" id="eb-prompt" rows="3" placeholder="Document the repeatable process..."></textarea></div>
+      <div class="fg"><label class="fl">Distribution Step</label><input class="fi" id="eb-distribution" type="text" placeholder="How does output get to the platform?"></div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Celeste Review Needed?</label><select class="fi" id="eb-celeste-review"><option>Yes</option><option>No</option></select></div>
+        <div class="fg"><label class="fl">Danielle Approval Needed?</label><select class="fi" id="eb-danielle-needed"><option>No</option><option>Yes</option></select></div>
+      </div>
+      <div class="fg"><label class="fl">Approval Reason (if Danielle needed)</label><input class="fi" id="eb-approval-reason" type="text" placeholder="Pricing, claims, medical language, brand direction..."></div>
+      <div class="fg"><label class="fl">Metrics to Watch</label><input class="fi" id="eb-metrics" type="text" placeholder="Saves, shares, bookings, clicks..."></div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Decision</label><select class="fi" id="eb-decision"><option>Pending</option><option>Repeat</option><option>Revise</option><option>Stop</option></select></div>
+        <div class="fg"><label class="fl">Template Created?</label><select class="fi" id="eb-template"><option>No</option><option>Yes</option></select></div>
+      </div>
+      <div class="fg"><label class="fl">Notes</label><textarea class="fi" id="eb-notes" rows="2" placeholder="Any additional context..."></textarea></div>
+      <button class="abtn abtn-primary" style="margin-top:8px;width:100%" onclick="saveEngineToLibrary()">Save to Engine Library</button>
+    </div>
+  </div>
+</div>
+<div class="section" id="sec-engine-library">
+  <div class="ph">
+    <h1>Content Engine Library</h1>
+    <p>Working engines. Tested, documented, and ready to repeat.</p>
+  </div>
+  <div class="tw">
+    <table>
+      <thead><tr>
+        <th>Engine Name</th><th>Source Input</th><th>Outputs</th><th>Tools Used</th><th>Prompt / Process Link</th><th>Status</th><th>Last Tested</th><th>Works?</th><th>Metrics Result</th><th>Repeat?</th><th>Notes</th><th></th>
+      </tr></thead>
+      <tbody id="engine-lib-body"></tbody>
+    </table>
+  </div>
+  <button class="add-btn" onclick="addEngineLibRow({})">+ Add Engine</button>
+</div>
+<div class="section" id="sec-auto-engines">
+  <div class="ph">
+    <h1>Automation Engines</h1>
+    <p>GitHub tools, n8n stacks, Claude Code, AI image workflows multiplying HueVine content.</p>
+  </div>
+  <div class="tw">
+    <table>
+      <thead><tr>
+        <th>Tool Name</th><th>Type</th><th>Link</th><th>Purpose</th><th>Content Use Case</th><th>Status</th><th>Cost</th><th>License Notes</th><th>Setup Notes</th><th>Security Risk</th><th>Brand Risk</th><th>Review Required?</th><th>Owner</th><th>Next Step</th><th></th>
+      </tr></thead>
+      <tbody id="auto-engines-body"></tbody>
+    </table>
+  </div>
+  <button class="add-btn" onclick="addAutoEngineRow({})">+ Add Tool</button>
+</div>
+<div class="section" id="sec-auto-review">
+  <div class="ph">
+    <h1>Automation Review</h1>
+    <p>Every AI-generated output passes through here before distribution.</p>
+  </div>
+  <div class="rule-box">Automation does not publish by itself. Celeste reviews before distribution. Danielle only reviews risk, claims, offers, pricing, or major brand direction.</div>
+  <div class="tw">
+    <table>
+      <thead><tr>
+        <th>Automation Output</th><th>Source SLP</th><th>Engine Used</th><th>Output Type</th><th>Platform</th><th>Generated Link</th><th>Celeste Decision</th><th>Approved?</th><th>Needs Danielle?</th><th>Notes</th><th>Status</th><th></th>
+      </tr></thead>
+      <tbody id="auto-review-body"></tbody>
+    </table>
+  </div>
+  <button class="add-btn" onclick="addAutoReviewRow()">+ Add Output for Review</button>
+</div>
+<div class="section" id="sec-publish">
+  <div class="ph">
+    <h1>Publish / Schedule</h1>
+    <p>A graphic is not done because it was made. It is done when distributed, tracked, measured, and archived.</p>
+  </div>
+  <div class="tw">
+    <table>
+      <thead><tr>
+        <th>Asset</th><th>Campaign</th><th>Platform</th><th>Distribution Channel</th><th>Publish Date</th><th>Caption / Copy Link</th><th>Final Asset Link</th><th>Status</th><th>Posted?</th><th>Perf. Check Date</th><th>Notes</th><th></th>
+      </tr></thead>
+      <tbody id="publish-body"></tbody>
+    </table>
+  </div>
+  <button class="add-btn" onclick="addPublishRow()">+ Add to Queue</button>
+</div>
+<div class="section" id="sec-metrics">
+  <div class="ph">
+    <h1>Metrics + Next Moves</h1>
+    <p>What the data says decides what we repeat.</p>
+  </div>
+  <div class="tw">
+    <table>
+      <thead><tr>
+        <th>Asset / Content</th><th>Platform</th><th>Campaign</th><th>Content Type</th><th>Publish Date</th><th>Views / Reach</th><th>Engagement</th><th>Saves</th><th>Shares</th><th>Comments</th><th>Clicks</th><th>Bookings</th><th>Performance Label</th><th>What Data Says</th><th>Next Move</th><th>Task Created?</th><th>Engine Updated?</th><th></th>
+      </tr></thead>
+      <tbody id="metrics-body"></tbody>
+    </table>
+  </div>
+  <button class="add-btn" onclick="addMetricsRow()">+ Add Metric</button>
+</div>
+<div class="section" id="sec-archive">
+  <div class="ph">
+    <h1>Archive + Template Bank</h1>
+    <p>Completed assets. Reusable templates. HueVine Illustration Style Bank.</p>
+  </div>
+  <div class="info-box">Add the 30 illustrated graphics here to build the HueVine Illustration Style Bank. These become the source input for the Illustration Style Engine.</div>
+  <div class="tw">
+    <table>
+      <thead><tr>
+        <th>Asset Name</th><th>Work Type</th><th>Campaign</th><th>Final Link</th><th>Canva Link</th><th>Template Potential?</th><th>AI Can Recreate?</th><th>Prompt / Style Notes</th><th>Reuse Notes</th><th>Archive Status</th><th>Related Engine</th><th></th>
+      </tr></thead>
+      <tbody id="archive-body"></tbody>
+    </table>
+  </div>
+  <button class="add-btn" onclick="addArchiveRow()">+ Add Asset</button>
+</div>
+<div class="section" id="sec-timeblocks">
+  <div class="ph">
+    <h1>Weekly Time Blocks</h1>
+    <p>Rhythm is infrastructure. Same days, same creative energy.</p>
+  </div>
+  <div class="week-grid">
+    <div class="day-card">
+      <div class="day-name">Tuesday</div>
+      <div class="day-theme">Plan + Strategy</div>
+      <div class="day-desc">Orient the week. Know what matters before producing anything.</div>
+      <ul class="day-tasks">
+        <li>Review incoming SLPs from Danielle</li>
+        <li>Check platform metrics from prior week</li>
+        <li>Set Today's Top 3 for the week</li>
+        <li>Confirm automation vs original work split</li>
+        <li>Update Work Queue priorities</li>
+      </ul>
+    </div>
+    <div class="day-card">
+      <div class="day-name">Wednesday</div>
+      <div class="day-theme">Repeatable Production</div>
+      <div class="day-desc">Engine output day. AI-assisted. Batch. Produce multiples from one source.</div>
+      <ul class="day-tasks">
+        <li>Run active content engines</li>
+        <li>Graphics, AI-assisted batches</li>
+        <li>Captions and copy variations</li>
+        <li>Product education outputs</li>
+        <li>Review automation outputs before EOD</li>
+      </ul>
+    </div>
+    <div class="day-card">
+      <div class="day-name">Thursday</div>
+      <div class="day-theme">Original Creative</div>
+      <div class="day-desc">Custom work. Campaign visuals. Human judgment required.</div>
+      <ul class="day-tasks">
+        <li>Campaign hero graphics</li>
+        <li>Custom product visuals</li>
+        <li>Content engine building or improving</li>
+        <li>Client proof formatting</li>
+        <li>New illustration style work</li>
+      </ul>
+    </div>
+    <div class="day-card">
+      <div class="day-name">Friday</div>
+      <div class="day-theme">Review + Distribute</div>
+      <div class="day-desc">Nothing ships without review. Distribution is part of completion.</div>
+      <ul class="day-tasks">
+        <li>Automation output review</li>
+        <li>Approve and publish ready content</li>
+        <li>Schedule the coming week</li>
+        <li>Flag anything needing Danielle</li>
+        <li>Send Daily Command Report</li>
+      </ul>
+    </div>
+    <div class="day-card">
+      <div class="day-name">Saturday</div>
+      <div class="day-theme">Archive + Document</div>
+      <div class="day-desc">Working content gets documented so it can scale.</div>
+      <ul class="day-tasks">
+        <li>Archive completed assets</li>
+        <li>Update Template Bank</li>
+        <li>Document winning prompts and processes</li>
+        <li>Add to Illustration Style Bank</li>
+        <li>Prep next batch inputs</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="section" id="sec-report">
+  <div class="ph">
+    <h1>Daily Command Report</h1>
+    <p>End of day accountability. What moved, what did not, what needs Danielle.</p>
+  </div>
+  <div class="bento b2">
+    <div class="card">
+      <div class="fg"><label class="fl">Date</label><input class="fi" id="rpt-date" type="date"></div>
+      <div class="fg"><label class="fl">Top 3 Completed</label><textarea class="fi" id="rpt-top3" rows="2" placeholder="Which tasks were completed?"></textarea></div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Focus Sessions</label><input class="fi" id="rpt-sessions" type="number" placeholder="0"></div>
+        <div class="fg"><label class="fl">Pomodoros</label><input class="fi" id="rpt-poms" type="number" placeholder="0"></div>
+      </div>
+      <div class="fg"><label class="fl">In Progress</label><textarea class="fi" id="rpt-progress" rows="2" placeholder="What is still open and moving?"></textarea></div>
+      <div class="fg"><label class="fl">Blocked</label><textarea class="fi" id="rpt-blocked" rows="2" placeholder="What stopped progress and why?"></textarea></div>
+      <div class="fg"><label class="fl">Automation Reviewed</label><select class="fi" id="rpt-auto"><option>Yes</option><option>No</option><option>Partial</option></select></div>
+    </div>
+    <div class="card">
+      <div class="fg"><label class="fl">Published / Scheduled</label><textarea class="fi" id="rpt-published" rows="2" placeholder="What went live or was queued?"></textarea></div>
+      <div class="fg"><label class="fl">Metrics Checked</label><select class="fi" id="rpt-metrics-checked"><option>Yes</option><option>No</option></select></div>
+      <div class="fg"><label class="fl">Archived / Templated</label><textarea class="fi" id="rpt-archived" rows="2" placeholder="What was documented or archived?"></textarea></div>
+      <div class="fg"><label class="fl">Engine Built or Improved</label><textarea class="fi" id="rpt-engine" rows="2" placeholder="Any engine progress today?"></textarea></div>
+      <div class="fg"><label class="fl">Tomorrow's Top 3</label><textarea class="fi" id="rpt-tomorrow" rows="3" placeholder="Three most important tasks tomorrow?"></textarea></div>
+      <div class="fg"><label class="fl">Needs Danielle</label><textarea class="fi" id="rpt-danielle" rows="2" placeholder="Decisions, approvals, flagged items?"></textarea></div>
+      <button class="abtn abtn-primary" style="margin-top:8px;width:100%" onclick="saveReport()">Save Report</button>
+    </div>
+  </div>
+</div>
+<div class="section" id="sec-danielle">
+  <div class="ph">
+    <h1>Needs Danielle</h1>
+    <p>Only route here when it truly requires the principal decision-maker.</p>
+  </div>
+  <div class="gate-banner">
+    <div class="gate-title">Route to Danielle Only For:</div>
+    <div class="gate-pills">
+      <span class="gate-pill">Pricing</span>
+      <span class="gate-pill">Offers</span>
+      <span class="gate-pill">Product Claims</span>
+      <span class="gate-pill">Service Claims</span>
+      <span class="gate-pill">Medical / Skin Claims</span>
+      <span class="gate-pill">Before / After Claims</span>
+      <span class="gate-pill">Client-Sensitive Content</span>
+      <span class="gate-pill">Public Controversy Risk</span>
+      <span class="gate-pill">Major Brand Direction</span>
+      <span class="gate-pill">Paid Tool Decisions</span>
+      <span class="gate-pill">Final Launch Decisions</span>
+    </div>
+  </div>
+  <div class="rule-box">Do not route normal graphics, captions, scheduling, or routine content decisions to Danielle unless they touch risk.</div>
+  <div class="tw">
+    <table>
+      <thead><tr>
+        <th>Item</th><th>Risk Type</th><th>Campaign</th><th>Platform</th><th>Asset Link</th><th>Context</th><th>Celeste Recommendation</th><th>Priority</th><th>Status</th><th>Danielle Decision</th><th>Date Flagged</th><th></th>
+      </tr></thead>
+      <tbody id="danielle-body"></tbody>
+    </table>
+  </div>
+  <button class="add-btn" onclick="addDanielleRow()">+ Flag Item</button>
+</div>
+
+<!-- SOCIAL GROWTH -->
+<div class="section" id="sec-social-growth">
+  <div class="ph">
+    <h1>Social Growth Dashboard</h1>
+    <p>Track weekly progress toward 10X high-quality performing content. Enter numbers every Friday during metrics review.</p>
+  </div>
+
+  <div class="sg-goal-banner">
+    <div>
+      <div class="sg-goal-title">10X High-Quality Content Goal</div>
+      <div class="sg-goal-text">One HueVine piece that saves, shares, books, or drives real action = quality content.</div>
+      <div class="sg-goal-sub">Baseline: set below. Goal: 10X that number of quality pieces per week, per platform.</div>
+    </div>
+    <button class="abtn abtn-secondary" onclick="sgSetBaseline()" style="white-space:nowrap;font-size:12px;padding:8px 14px">Set / Update Baseline</button>
+  </div>
+
+  <div class="stitle">10X Progress by Platform</div>
+  <div class="sg-10x-grid" id="sg-10x-grid">
+    <div style="color:var(--text-muted);font-size:13px;padding:16px">Set your baseline and add your first weekly snapshot to see 10X progress here.</div>
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+    <div class="stitle" style="margin-bottom:0">Weekly Snapshots</div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <div class="sg-week-tabs" id="sg-week-tabs"></div>
+      <button class="sg-new-week-btn" onclick="sgAddWeek()">+ New Week</button>
+    </div>
+  </div>
+
+  <div id="sg-week-content">
+    <div style="color:var(--text-muted);font-size:13px;padding:16px;background:var(--card);border-radius:var(--r-lg);border:1px solid var(--border)">Click <strong>+ New Week</strong> to log this week. Do this every Friday during your metrics review.</div>
+  </div>
+
+  <div class="sg-what-working">
+    <div class="stitle" style="margin-bottom:0;border-bottom:none;padding-bottom:0">Weekly Growth Notes</div>
+    <div class="sg-ww-grid">
+      <div class="sg-ww-panel">
+        <div class="sg-ww-label">What is Working (double down)</div>
+        <textarea class="sg-ww-input" id="sg-working" placeholder="Content types, platforms, formats, timing, topics that performed well this week..."></textarea>
+      </div>
+      <div class="sg-ww-panel">
+        <div class="sg-ww-label">What to Stop or Reduce</div>
+        <textarea class="sg-ww-input" id="sg-stop" placeholder="Low-performing formats, wasted effort, platforms showing no signal..."></textarea>
+      </div>
+      <div class="sg-ww-panel">
+        <div class="sg-ww-label">Engine Opportunity Spotted</div>
+        <textarea class="sg-ww-input" id="sg-engine-opp" placeholder="What content could be turned into a repeatable engine based on this week's performance?"></textarea>
+      </div>
+      <div class="sg-ww-panel">
+        <div class="sg-ww-label">Next Week Priority Focus</div>
+        <textarea class="sg-ww-input" id="sg-next-focus" placeholder="What is the single most important platform or content type to push harder next week?"></textarea>
+      </div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button class="sg-analyze-btn" id="sg-analyze-btn" onclick="sgAnalyze()">Get 10X Growth Analysis from Claude</button>
+      <button class="add-btn" style="width:auto;margin:0;padding:7px 14px" onclick="sgSaveNotes()">Save Notes</button>
+    </div>
+    <div class="sg-analysis-result" id="sg-analysis-result"></div>
+  </div>
+
+  <div class="stitle">Growth History</div>
+  <div class="tw">
+    <table class="sg-history-table">
+      <thead><tr>
+        <th>Week</th>
+        <th>IG Quality</th><th>TT Quality</th><th>YT Quality</th><th>PIN Quality</th>
+        <th>Email Quality</th><th>SMS Quality</th>
+        <th>Total Quality</th><th>vs Prior Week</th><th>10X Progress</th><th>Top Platform</th>
+      </tr></thead>
+      <tbody id="sg-history-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- RESOURCE DROPS -->
+<div class="section" id="sec-resource-drops">
+  <div class="ph">
+    <h1>Resource Drops</h1>
+    <p>Drop any GitHub repo, tool URL, YouTube link, or software name. Claude analyzes it against HueVine goals and tells Celeste exactly what to do with it.</p>
+  </div>
+
+  <div class="rd-input-area">
+    <div class="rd-url-row">
+      <input class="rd-url-input" id="rd-url" type="text" placeholder="Paste a GitHub URL, tool link, YouTube video, or just type a tool name...">
+      <button class="rd-analyze-btn" id="rd-btn" onclick="rdAnalyze()">Analyze for HueVine</button>
+    </div>
+    <textarea class="rd-context" id="rd-context" placeholder="Optional: add context. Why did Danielle send this? What problem are we solving? What engine could this help build?"></textarea>
+  </div>
+
+  <div class="rd-thinking" id="rd-thinking">
+    <div class="rd-pulse"></div>
+    Analyzing against HueVine goals and content engine stack...
+  </div>
+
+  <div class="rd-result" id="rd-result">
+    <div class="rd-result-header">
+      <div class="rd-result-title" id="rd-result-title">Resource Analysis</div>
+      <div class="rd-result-url" id="rd-result-url"></div>
+    </div>
+    <div class="rd-fields" id="rd-fields"></div>
+    <div class="rd-rec" id="rd-rec" style="display:none">
+      <div class="rd-rec-label">Recommendation</div>
+      <div class="rd-rec-value" id="rd-rec-value"></div>
+    </div>
+    <div style="padding:14px 18px;border-top:1px solid var(--border)">
+      <button class="rd-save-btn" onclick="rdSaveToLibrary()">Save to Resource Library</button>
+    </div>
+  </div>
+
+  <div class="stitle" style="margin-top:8px">Resource Library</div>
+  <div class="rule-box">Every analyzed resource is logged here. Route anything useful to Automation Engines or Engine Builder.</div>
+  <div class="tw">
+    <table>
+      <thead><tr>
+        <th>Resource</th><th>Type</th><th>What It Is</th><th>HueVine Application</th><th>Recommendation</th><th>Difficulty</th><th>Cost</th><th>First Step</th><th>Engine Potential</th><th>Status</th><th>Added</th><th></th>
+      </tr></thead>
+      <tbody id="rd-library-body"></tbody>
+    </table>
+  </div>
+  <button class="add-btn" onclick="rdAddManualRow()">+ Add Resource Manually</button>
+</div>
+
+
+<!-- PROJECTS -->
+<div class="section" id="sec-projects">
+  <div class="ph">
+    <h1>Projects</h1>
+    <p>Each project card holds its own task list, due date, and links. Use the export buttons to push any project directly into Claude Code or Cursor as a ready-to-run prompt.</p>
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="abtn abtn-primary" onclick="prjAddProject()">+ New Project</button>
+      <select id="prj-filter-status" onchange="prjRenderAll()" style="padding:6px 10px;font-size:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:var(--font)">
+        <option value="">All Statuses</option>
+        <option value="Active">Active</option>
+        <option value="Blocked">Blocked</option>
+        <option value="In Review">In Review</option>
+        <option value="Done">Done</option>
+        <option value="Parked">Parked</option>
+      </select>
+      <select id="prj-filter-priority" onchange="prjRenderAll()" style="padding:6px 10px;font-size:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:var(--font)">
+        <option value="">All Priorities</option>
+        <option value="ASAP">ASAP</option>
+        <option value="High">High</option>
+        <option value="Medium">Medium</option>
+        <option value="Low">Low</option>
+      </select>
+    </div>
+    <div id="prj-count-badge" style="font-size:11px;font-weight:700;color:var(--text-muted)"></div>
+  </div>
+
+  <div id="prj-grid" class="prj-grid"></div>
+
+  <div id="prj-empty" style="display:none;padding:40px;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:var(--r-xl)">
+    <div style="font-size:14px;font-weight:700;color:var(--text-mid);margin-bottom:8px">No projects yet.</div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Create your first project and start adding tasks. Use the export button to push it straight into Claude Code or Cursor.</div>
+    <button class="abtn abtn-primary" onclick="prjAddProject()">+ Create First Project</button>
+  </div>
+</div>
+
+<div class="prj-copy-toast" id="prj-copy-toast"></div>
+
+<!-- HOW TO USE -->
+<div class="section" id="sec-how-to-use">
+  <div class="ph">
+    <h1>How To Use This Workspace</h1>
+    <p>Celeste's operating guide. Read once. Reference as needed. This workspace runs on one rule: repeatable work becomes a machine.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-xl);padding:22px">
+      <div class="stitle" style="margin-bottom:12px">The Core Operating Rule</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--surface);border-radius:var(--r);border-left:3px solid var(--accent)">
+          <span style="color:var(--accent);font-weight:800;font-size:11px;min-width:20px;margin-top:1px">01</span>
+          <div><div style="font-weight:700;font-size:13px;color:var(--text)">Repeatable work gets automated.</div><div style="font-size:12px;color:var(--text-mid);margin-top:2px">If you do it more than twice, build a content engine for it.</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--surface);border-radius:var(--r);border-left:3px solid var(--gold)">
+          <span style="color:var(--gold);font-weight:800;font-size:11px;min-width:20px;margin-top:1px">02</span>
+          <div><div style="font-weight:700;font-size:13px;color:var(--text)">Original work gets documented.</div><div style="font-size:12px;color:var(--text-mid);margin-top:2px">Custom work lives in Archive. Style notes and prompts get saved so it can be recreated.</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--surface);border-radius:var(--r);border-left:3px solid var(--green)">
+          <span style="color:var(--green);font-weight:800;font-size:11px;min-width:20px;margin-top:1px">03</span>
+          <div><div style="font-weight:700;font-size:13px;color:var(--text)">Working content becomes an engine.</div><div style="font-size:12px;color:var(--text-mid);margin-top:2px">When something performs, document the process, template it, and build a repeatable system.</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--surface);border-radius:var(--r);border-left:3px solid var(--blue)">
+          <span style="color:var(--blue);font-weight:800;font-size:11px;min-width:20px;margin-top:1px">04</span>
+          <div><div style="font-weight:700;font-size:13px;color:var(--text)">Automation gets reviewed.</div><div style="font-size:12px;color:var(--text-mid);margin-top:2px">AI does not publish by itself. Every output passes through Automation Review before distribution.</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--surface);border-radius:var(--r);border-left:3px solid var(--yellow)">
+          <span style="color:var(--yellow);font-weight:800;font-size:11px;min-width:20px;margin-top:1px">05</span>
+          <div><div style="font-weight:700;font-size:13px;color:var(--text)">Distribution is part of completion.</div><div style="font-size:12px;color:var(--text-mid);margin-top:2px">A graphic is not done because it was made. Done = published, tracked, archived.</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--surface);border-radius:var(--r);border-left:3px solid var(--accent)">
+          <span style="color:var(--accent);font-weight:800;font-size:11px;min-width:20px;margin-top:1px">06</span>
+          <div><div style="font-weight:700;font-size:13px;color:var(--text)">Metrics decide what we repeat.</div><div style="font-size:12px;color:var(--text-mid);margin-top:2px">Every piece gets measured. Winners become engines. Low performers get retired or revised.</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--surface);border-radius:var(--r);border-left:3px solid var(--gold)">
+          <span style="color:var(--gold);font-weight:800;font-size:11px;min-width:20px;margin-top:1px">07</span>
+          <div><div style="font-weight:700;font-size:13px;color:var(--text)">Time blocks keep creative work moving.</div><div style="font-size:12px;color:var(--text-mid);margin-top:2px">No task gets unlimited time. When the block ends, you choose what happens next.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-xl);padding:22px">
+        <div class="stitle" style="margin-bottom:12px">Your Daily Flow</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--accent-dim);border-radius:var(--r)">
+            <span style="background:var(--accent);color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;min-width:40px;text-align:center">FIRST</span>
+            <span style="font-size:13px;font-weight:600;color:var(--text)">Open Dashboard → check status cards</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border-radius:var(--r)">
+            <span style="background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold);font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;min-width:40px;text-align:center">2</span>
+            <span style="font-size:13px;font-weight:600;color:var(--text)">Set Today's Top 3</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border-radius:var(--r)">
+            <span style="background:var(--surface);border:1px solid var(--border);color:var(--text-mid);font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;min-width:40px;text-align:center">3</span>
+            <span style="font-size:13px;font-weight:600;color:var(--text)">Start Focus Timer → work Top 3</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border-radius:var(--r)">
+            <span style="background:var(--surface);border:1px solid var(--border);color:var(--text-mid);font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;min-width:40px;text-align:center">4</span>
+            <span style="font-size:13px;font-weight:600;color:var(--text)">Review Automation Outputs before publishing</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border-radius:var(--r)">
+            <span style="background:var(--surface);border:1px solid var(--border);color:var(--text-mid);font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;min-width:40px;text-align:center">5</span>
+            <span style="font-size:13px;font-weight:600;color:var(--text)">Publish / Schedule approved content</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border-radius:var(--r)">
+            <span style="background:var(--surface);border:1px solid var(--border);color:var(--text-mid);font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;min-width:40px;text-align:center">6</span>
+            <span style="font-size:13px;font-weight:600;color:var(--text)">Log metrics → update engines</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border-radius:var(--r)">
+            <span style="background:var(--surface);border:1px solid var(--border);color:var(--text-mid);font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;min-width:40px;text-align:center">END</span>
+            <span style="font-size:13px;font-weight:600;color:var(--text)">Fill Daily Command Report</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-xl);padding:22px">
+        <div class="stitle" style="margin-bottom:12px">Weekly Rhythm</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div style="padding:10px 12px;background:var(--surface);border-radius:var(--r);border-top:2px solid var(--blue)">
+            <div style="font-size:11px;font-weight:800;color:var(--blue);margin-bottom:3px">TUESDAY</div>
+            <div style="font-size:12px;color:var(--text);font-weight:500">Plan week, review SLPs, check metrics, set Top 3</div>
+          </div>
+          <div style="padding:10px 12px;background:var(--surface);border-radius:var(--r);border-top:2px solid var(--green)">
+            <div style="font-size:11px;font-weight:800;color:var(--green);margin-bottom:3px">WEDNESDAY</div>
+            <div style="font-size:12px;color:var(--text);font-weight:500">Repeatable production, graphics, batches, AI-assisted work</div>
+          </div>
+          <div style="padding:10px 12px;background:var(--surface);border-radius:var(--r);border-top:2px solid var(--gold)">
+            <div style="font-size:11px;font-weight:800;color:var(--gold);margin-bottom:3px">THURSDAY</div>
+            <div style="font-size:12px;color:var(--text);font-weight:500">Original creative, campaign visuals, engine building</div>
+          </div>
+          <div style="padding:10px 12px;background:var(--surface);border-radius:var(--r);border-top:2px solid var(--accent)">
+            <div style="font-size:11px;font-weight:800;color:var(--accent);margin-bottom:3px">FRIDAY</div>
+            <div style="font-size:12px;color:var(--text);font-weight:500">Automation review, publish, schedule, distribute</div>
+          </div>
+          <div style="padding:10px 12px;background:var(--surface);border-radius:var(--r);border-top:2px solid var(--text-muted);grid-column:1/-1">
+            <div style="font-size:11px;font-weight:800;color:var(--text-mid);margin-bottom:3px">SATURDAY</div>
+            <div style="font-size:12px;color:var(--text);font-weight:500">Archive, template bank, document original work, prep next batch</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-xl);padding:20px">
+      <div class="stitle" style="margin-bottom:12px">When to Route to Danielle</div>
+      <div style="font-size:12px;color:var(--text-mid);margin-bottom:10px;font-weight:500">Only send to Danielle when it involves:</div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div style="font-size:12px;color:var(--text);padding:5px 8px;background:var(--red-dim);border-radius:5px;font-weight:600">Pricing or offers</div>
+        <div style="font-size:12px;color:var(--text);padding:5px 8px;background:var(--red-dim);border-radius:5px;font-weight:600">Medical or skin claims</div>
+        <div style="font-size:12px;color:var(--text);padding:5px 8px;background:var(--red-dim);border-radius:5px;font-weight:600">Before/after content</div>
+        <div style="font-size:12px;color:var(--text);padding:5px 8px;background:var(--red-dim);border-radius:5px;font-weight:600">Client-sensitive content</div>
+        <div style="font-size:12px;color:var(--text);padding:5px 8px;background:var(--red-dim);border-radius:5px;font-weight:600">Public controversy risk</div>
+        <div style="font-size:12px;color:var(--text);padding:5px 8px;background:var(--red-dim);border-radius:5px;font-weight:600">Major brand direction changes</div>
+        <div style="font-size:12px;color:var(--text);padding:5px 8px;background:var(--red-dim);border-radius:5px;font-weight:600">Paid tool decisions</div>
+        <div style="font-size:12px;color:var(--text);padding:5px 8px;background:var(--red-dim);border-radius:5px;font-weight:600">Final launch decisions</div>
+      </div>
+      <div style="margin-top:12px;padding:10px;background:var(--green-dim);border-radius:var(--r);font-size:12px;color:var(--green);font-weight:600">Normal graphics, captions, scheduling = Celeste decides. No Danielle needed.</div>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-xl);padding:20px">
+      <div class="stitle" style="margin-bottom:12px">What Each Section Is For</div>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <div style="padding:7px 10px;background:var(--surface);border-radius:var(--r)">
+          <div style="font-size:11px;font-weight:800;color:var(--accent)">DASHBOARD</div>
+          <div style="font-size:12px;color:var(--text);font-weight:500">Morning check-in. Status of everything at a glance.</div>
+        </div>
+        <div style="padding:7px 10px;background:var(--surface);border-radius:var(--r)">
+          <div style="font-size:11px;font-weight:800;color:var(--accent)">TOP 3</div>
+          <div style="font-size:12px;color:var(--text);font-weight:500">Three tasks only. Work these before anything else.</div>
+        </div>
+        <div style="padding:7px 10px;background:var(--surface);border-radius:var(--r)">
+          <div style="font-size:11px;font-weight:800;color:var(--accent)">FOCUS TIMER</div>
+          <div style="font-size:12px;color:var(--text);font-weight:500">Time-box every session. Choose what happens when the block ends.</div>
+        </div>
+        <div style="padding:7px 10px;background:var(--surface);border-radius:var(--r)">
+          <div style="font-size:11px;font-weight:800;color:var(--accent)">WORK QUEUE</div>
+          <div style="font-size:12px;color:var(--text);font-weight:500">Full project list. In Progress is a status, not a tab.</div>
+        </div>
+        <div style="padding:7px 10px;background:var(--surface);border-radius:var(--r)">
+          <div style="font-size:11px;font-weight:800;color:var(--accent)">ENGINE BUILDER</div>
+          <div style="font-size:12px;color:var(--text);font-weight:500">Turn working content into a repeatable machine.</div>
+        </div>
+        <div style="padding:7px 10px;background:var(--surface);border-radius:var(--r)">
+          <div style="font-size:11px;font-weight:800;color:var(--accent)">AUTO REVIEW</div>
+          <div style="font-size:12px;color:var(--text);font-weight:500">Every AI output stops here before it goes anywhere.</div>
+        </div>
+        <div style="padding:7px 10px;background:var(--surface);border-radius:var(--r)">
+          <div style="font-size:11px;font-weight:800;color:var(--accent)">RESOURCE DROPS</div>
+          <div style="font-size:12px;color:var(--text);font-weight:500">Paste any GitHub link, tool URL, or software name. Claude analyzes it for HueVine.</div>
+        </div>
+        <div style="padding:7px 10px;background:var(--surface);border-radius:var(--r)">
+          <div style="font-size:11px;font-weight:800;color:var(--accent)">SOCIAL GROWTH</div>
+          <div style="font-size:12px;color:var(--text);font-weight:500">Weekly tracking toward 10X quality content per platform.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-xl);padding:20px">
+      <div class="stitle" style="margin-bottom:12px">The 7 Starter Content Engines</div>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <div style="padding:8px 10px;background:var(--surface);border-radius:var(--r);border-left:3px solid var(--accent)">
+          <div style="font-size:11px;font-weight:800;color:var(--accent)">ILLUSTRATION STYLE</div>
+          <div style="font-size:11px;color:var(--text-mid);margin-top:1px;font-weight:500">30 existing graphics → new illustrations, story slides, carousels</div>
+        </div>
+        <div style="padding:8px 10px;background:var(--surface);border-radius:var(--r);border-left:3px solid var(--gold)">
+          <div style="font-size:11px;font-weight:800;color:var(--gold)">PRODUCT EDUCATION</div>
+          <div style="font-size:11px;color:var(--text-mid);margin-top:1px;font-weight:500">Product fact sheet → graphic, reel script, email, SMS, Pinterest</div>
+        </div>
+        <div style="padding:8px 10px;background:var(--surface);border-radius:var(--r);border-left:3px solid var(--blue)">
+          <div style="font-size:11px;font-weight:800;color:var(--blue)">SERVICE EXPLAINER</div>
+          <div style="font-size:11px;color:var(--text-mid);margin-top:1px;font-weight:500">Service topic → carousel, reel, FAQ post, email, website blurb</div>
+        </div>
+        <div style="padding:8px 10px;background:var(--surface);border-radius:var(--r);border-left:3px solid var(--green)">
+          <div style="font-size:11px;font-weight:800;color:var(--green)">CLIENT PROOF</div>
+          <div style="font-size:11px;color:var(--text-mid);margin-top:1px;font-weight:500">Review or testimonial → quote graphic, carousel, email proof</div>
+        </div>
+        <div style="padding:8px 10px;background:var(--surface);border-radius:var(--r);border-left:3px solid var(--yellow)">
+          <div style="font-size:11px;font-weight:800;color:var(--yellow)">METRICS → NEXT BATCH</div>
+          <div style="font-size:11px;color:var(--text-mid);margin-top:1px;font-weight:500">Platform metrics → next content tasks based on what performed</div>
+        </div>
+        <div style="padding:8px 10px;background:var(--surface);border-radius:var(--r);border-left:3px solid var(--accent)">
+          <div style="font-size:11px;font-weight:800;color:var(--accent)">LONGFORM → SHORTFORM</div>
+          <div style="font-size:11px;color:var(--text-mid);margin-top:1px;font-weight:500">YouTube / transcript → clips, reels, email tips, carousels</div>
+        </div>
+        <div style="padding:8px 10px;background:var(--surface);border-radius:var(--r);border-left:3px solid var(--gold)">
+          <div style="font-size:11px;font-weight:800;color:var(--gold)">CAMPAIGN KIT</div>
+          <div style="font-size:11px;color:var(--text-mid);margin-top:1px;font-weight:500">One campaign SLP → full asset kit across all channels</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:linear-gradient(135deg,rgba(224,99,122,.08),rgba(201,166,112,.06));border:1px solid var(--border);border-radius:var(--r-xl);padding:24px;text-align:center">
+    <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:8px">The goal is not more manual content.</div>
+    <div style="font-size:16px;font-weight:800;color:var(--accent)">The goal is more repeatable creative machines.</div>
+    <div style="margin-top:12px;font-size:13px;color:var(--text-mid);font-weight:500;max-width:520px;margin-left:auto;margin-right:auto">One source input should produce multiple outputs. Metrics decide what gets repeated. Repeatable work gets built into an engine. Engines run so Celeste can focus on what only she can create.</div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════
+var SEC_MAP = {
+  dashboard:'sec-dashboard', top3:'sec-top3', focus:'sec-focus', queue:'sec-queue',
+  slp:'sec-slp', 'engine-builder':'sec-engine-builder', 'engine-library':'sec-engine-library',
+  'auto-engines':'sec-auto-engines', 'auto-review':'sec-auto-review', publish:'sec-publish',
+  metrics:'sec-metrics', archive:'sec-archive', timeblocks:'sec-timeblocks',
+  report:'sec-report', danielle:'sec-danielle', 'resource-drops':'sec-resource-drops', 'social-growth':'sec-social-growth', 'how-to-use':'sec-how-to-use', 'projects':'sec-projects'
+};
+function showSection(id) {
+  Object.values(SEC_MAP).forEach(function(sid) {
+    var el = document.getElementById(sid);
+    if (el) el.classList.remove('active');
+  });
+  var t = document.getElementById(SEC_MAP[id]);
+  if (t) t.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(ni) {
+    var oc = ni.getAttribute('onclick') || '';
+    ni.classList.toggle('active', oc.indexOf("'" + id + "'") !== -1);
+  });
+  if (id === 'dashboard') renderDashboard();
+}
+
+// ════════════════════════════════════════
+// TIMER
+// ════════════════════════════════════════
+var T = { interval: null, remaining: 1500, total: 1500, state: 'idle', sessions: 0, preset: 25 };
+
+function setPreset(btn, mins) {
+  if (T.state === 'running') return;
+  T.preset = mins; T.total = mins * 60; T.remaining = mins * 60;
+  document.querySelectorAll('.preset').forEach(function(b) { b.classList.remove('sel'); });
+  btn.classList.add('sel');
+  renderClock();
+}
+
+function timerToggle() {
+  if (T.state === 'idle' || T.state === 'paused') startTimer();
+  else if (T.state === 'running') pauseTimer();
+}
+
+function startTimer() {
+  var taskEl = document.getElementById('timer-task');
+  var startEl = document.getElementById('timer-start-time');
+  if (startEl && T.state === 'idle') {
+    var now = new Date();
+    startEl.value = now.toTimeString().slice(0,5);
+  }
+  T.state = 'running';
+  setTimerState('running');
+  T.interval = setInterval(function() {
+    T.remaining--;
+    if (T.remaining <= 0) { T.remaining = 0; timerFinish(); }
+    renderClock();
+  }, 1000);
+}
+
+function pauseTimer() {
+  clearInterval(T.interval); T.interval = null;
+  T.state = 'paused';
+  setTimerState('paused');
+}
+
+function timerBlock() {
+  clearInterval(T.interval); T.interval = null;
+  T.state = 'blocked';
+  setTimerState('blocked');
+}
+
+function timerFinish() {
+  clearInterval(T.interval); T.interval = null;
+  T.state = 'complete'; T.sessions++;
+  var stopEl = document.getElementById('timer-stop-time');
+  if (stopEl) { var n = new Date(); stopEl.value = n.toTimeString().slice(0,5); }
+  logSession();
+  saveTimerSessions();
+  setTimerState('complete');
+  setTimeout(function() { timerReset(); }, 3000);
+}
+
+function timerReset() {
+  clearInterval(T.interval); T.interval = null;
+  T.state = 'idle'; T.remaining = T.preset * 60;
+  var startEl = document.getElementById('timer-start-time');
+  var stopEl = document.getElementById('timer-stop-time');
+  if (startEl) startEl.value = '';
+  if (stopEl) stopEl.value = '';
+  setTimerState('idle');
+}
+
+function goAfter(dest) { timerReset(); showSection(dest); }
+
+function setTimerState(state) {
+  var clock = document.getElementById('timer-clock');
+  var stateLabel = document.getElementById('timer-state-label');
+  var taskLabel = document.getElementById('timer-task-label');
+  var sessLabel = document.getElementById('timer-sessions');
+  var bar = document.getElementById('focus-bar');
+  var hdrBtn = document.getElementById('hdr-btn');
+  var hdrLabel = document.getElementById('hdr-label');
+  var hdrCount = document.getElementById('hdr-count');
+  var tStartBtn = document.getElementById('t-start');
+  var taskInput = document.getElementById('timer-task');
+  var taskName = taskInput ? taskInput.value || 'Creative Flow Active' : 'Creative Flow Active';
+  var stateNames = { idle: 'Not Started', running: 'Creative Flow Active', paused: 'Paused', blocked: 'Blocked', complete: 'Session Complete' };
+  if (clock) clock.className = 'timer-clock ' + state;
+  if (stateLabel) stateLabel.textContent = stateNames[state] || state;
+  if (taskLabel) taskLabel.textContent = (state === 'running' || state === 'paused') ? taskName : '';
+  if (sessLabel) sessLabel.textContent = T.sessions + ' session' + (T.sessions !== 1 ? 's' : '') + ' completed today';
+  if (bar) bar.className = 'focus-bar' + (state !== 'idle' && state !== 'complete' ? ' ' + state : '');
+  var btnLabels = { idle: 'Start', running: 'Pause', paused: 'Resume', blocked: 'Blocked', complete: 'Done' };
+  if (hdrBtn) hdrBtn.textContent = btnLabels[state] || 'Start';
+  if (hdrLabel) hdrLabel.textContent = state === 'running' ? taskName : (state === 'idle' ? 'No active focus' : stateNames[state]);
+  if (hdrCount) hdrCount.textContent = T.sessions + ' sessions';
+  if (tStartBtn) tStartBtn.textContent = state === 'running' ? 'Pause Focus' : 'Start Focus';
+  renderClock();
+  var dashFocusTask = document.getElementById('dash-focus-task');
+  if (dashFocusTask) dashFocusTask.textContent = state === 'running' ? taskName : 'No active session';
+}
+
+function renderClock() {
+  var mins = Math.floor(T.remaining / 60);
+  var secs = T.remaining % 60;
+  var display = (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
+  var c = document.getElementById('timer-clock');
+  var h = document.getElementById('hdr-time');
+  var df = document.getElementById('dash-focus-time');
+  if (c) c.textContent = display;
+  if (h) h.textContent = display;
+  if (df) df.textContent = display;
+}
+
+function logSession() {
+  var body = document.getElementById('session-log');
+  if (!body) return;
+  var taskInput = document.getElementById('timer-task');
+  var modeInput = document.getElementById('timer-mode');
+  var task = taskInput ? (taskInput.value || 'Unnamed task') : 'Unnamed task';
+  var mode = modeInput ? modeInput.value : 'Quick Sprint';
+  var now = new Date();
+  var dateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  var tr = document.createElement('tr');
+  var td1 = document.createElement('td'); td1.textContent = task;
+  var td2 = document.createElement('td'); td2.textContent = mode;
+  var td3 = document.createElement('td'); td3.textContent = T.preset + 'm';
+  var td4 = document.createElement('td');
+  var badge = document.createElement('span'); badge.className = 'badge bg'; badge.textContent = 'Complete';
+  td4.appendChild(badge);
+  var td5 = document.createElement('td'); td5.textContent = dateStr; td5.style.fontSize = '11px'; td5.style.color = 'var(--text-muted)';
+  tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3); tr.appendChild(td4); tr.appendChild(td5);
+  body.insertBefore(tr, body.firstChild);
+  autoSave();
+}
+
+function saveTimerSessions() { localStorage.setItem('hv_sessions', String(T.sessions)); }
+function loadTimerSessions() {
+  var s = localStorage.getItem('hv_sessions');
+  if (s) { T.sessions = parseInt(s) || 0; }
+  var hdrCount = document.getElementById('hdr-count');
+  if (hdrCount) hdrCount.textContent = T.sessions + ' sessions';
+}
+
+// ════════════════════════════════════════
+// UTILITIES
+// ════════════════════════════════════════
+function esc(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function mkSelect(opts, val) {
+  var s = document.createElement('select');
+  opts.forEach(function(o) {
+    var op = document.createElement('option');
+    op.value = o; op.textContent = o;
+    if (o === val) op.selected = true;
+    s.appendChild(op);
+  });
+  s.addEventListener('change', autoSave);
+  return s;
+}
+
+function mkInput(ph, val) {
+  var i = document.createElement('input');
+  i.type = 'text'; i.placeholder = ph || '';
+  if (val) i.value = val;
+  i.addEventListener('change', autoSave);
+  return i;
+}
+
+function mkDelBtn() {
+  var btn = document.createElement('button');
+  btn.className = 'del'; btn.textContent = 'x';
+  btn.onclick = function() { this.closest('tr').remove(); autoSave(); };
+  return btn;
+}
+
+function appendCells(tr, elements) {
+  elements.forEach(function(el) {
+    var td = document.createElement('td'); td.appendChild(el); tr.appendChild(td);
+  });
+  var delTd = document.createElement('td'); delTd.appendChild(mkDelBtn()); tr.appendChild(delTd);
+}
+
+// ════════════════════════════════════════
+// ADD ROW FUNCTIONS
+// ════════════════════════════════════════
+var WORK_TYPES = ['Repeatable','Original','Hybrid'];
+var PRIORITIES = ['ASAP','High','Medium','Low'];
+var TIME_BLOCKS = ['25','30','45','60','90','120'];
+var STATUSES = ['Not Started','In Progress','Blocked','Automation Review','Ready to Publish','Scheduled','Published','Done','Archived'];
+var YES_NO = ['No','Yes'];
+var PLATFORMS = ['Instagram','TikTok','YouTube Shorts','YouTube Community','Facebook','Pinterest','Email','SMS','Website','Shopify','Booking Page'];
+
+function addTop3Row() {
+  var body = document.getElementById('top3-body');
+  var num = body.querySelectorAll('tr').length + 1;
+  var tr = document.createElement('tr');
+  var rankTd = document.createElement('td'); rankTd.className = 'rank-cell'; rankTd.textContent = num; tr.appendChild(rankTd);
+  appendCells(tr, [
+    mkInput('Task name'), mkInput('Campaign'), mkSelect(WORK_TYPES), mkSelect(PRIORITIES),
+    mkSelect(TIME_BLOCKS), mkInput('0'), mkSelect(['Not Started','In Progress','Done']),
+    mkInput('Next step'), mkInput('Due date'), mkInput('Link'), mkInput('Notes')
+  ]);
+  body.appendChild(tr); autoSave();
+}
+
+function addQueueRow() {
+  var body = document.getElementById('queue-body');
+  var tr = document.createElement('tr');
+  appendCells(tr, [
+    mkInput('Task'), mkInput('Campaign'), mkSelect(WORK_TYPES), mkSelect(PRIORITIES),
+    mkSelect(STATUSES), mkSelect(TIME_BLOCKS), mkInput('0'), mkInput('Next step'),
+    mkInput('Due'), mkInput('Source link'), mkInput('Asset link'), mkInput('Assigned to'), mkInput('Notes')
+  ]);
+  body.appendChild(tr); autoSave();
+}
+
+function addSLPRow() {
+  var body = document.getElementById('slp-body');
+  var tr = document.createElement('tr');
+  var sourceTypes = ['SLP','Product','Service','Event','Testimonial','Client Proof','Video','Idea','Existing Graphic'];
+  var statuses = ['Pending','In Review','Ready','Assigned','Complete'];
+  appendCells(tr, [
+    mkInput('SLP name'), mkInput('Drive link'), mkInput('Campaign'), mkSelect(sourceTypes),
+    mkInput('Assets needed'), mkSelect(WORK_TYPES), mkSelect(PRIORITIES), mkInput('Deadline'),
+    mkInput('Missing info'), mkSelect(YES_NO), mkSelect(statuses), mkSelect(YES_NO), mkInput('Engine type')
+  ]);
+  body.appendChild(tr); autoSave();
+}
+
+function addEngineLibRow(data) {
+  data = data || {};
+  var body = document.getElementById('engine-lib-body');
+  var tr = document.createElement('tr');
+  var statuses = ['Idea','Testing','Working','Needs Fix','Parked','Retired'];
+  var repeat = ['Pending','Repeat','Revise','Stop'];
+  appendCells(tr, [
+    mkInput('Engine name', data.name), mkInput('Source input', data.source),
+    mkInput('Outputs', data.outputs), mkInput('Tools', data.tools),
+    mkInput('Prompt / process link', data.promptLink),
+    mkSelect(statuses, data.status || 'Idea'), mkInput('Last tested', data.tested),
+    mkSelect(YES_NO, data.works || 'No'), mkInput('Metrics result', data.metricsResult),
+    mkSelect(repeat, data.repeat || 'Pending'), mkInput('Notes', data.notes)
+  ]);
+  body.appendChild(tr); autoSave();
+}
+
+function addAutoEngineRow(data) {
+  data = data || {};
+  var body = document.getElementById('auto-engines-body');
+  var tr = document.createElement('tr');
+  var types = ['GitHub Repo','n8n Workflow','Claude Code','ChatGPT Images','OpenAI API','Canva','Open Generative AI','Other'];
+  var statuses = ['Researching','Testing','Working','Needs Fix','Parked'];
+  var costs = ['Free','Paid','API Cost','Unknown'];
+  var risks = ['None','Low','Medium','High'];
+  appendCells(tr, [
+    mkInput('Tool name', data.name), mkSelect(types, data.type),
+    mkInput('Link', data.link), mkInput('Purpose', data.purpose),
+    mkInput('Content use case', data.useCase), mkSelect(statuses, data.status || 'Researching'),
+    mkSelect(costs, data.cost || 'Unknown'), mkInput('License notes', data.license),
+    mkInput('Setup notes', data.setup), mkSelect(risks, data.secRisk || 'Low'),
+    mkSelect(risks, data.brandRisk || 'Low'), mkSelect(YES_NO, data.reviewReq || 'Yes'),
+    mkInput('Owner', data.owner), mkInput('Next step', data.next)
+  ]);
+  body.appendChild(tr); autoSave();
+}
+
+function addAutoReviewRow() {
+  var body = document.getElementById('auto-review-body');
+  var tr = document.createElement('tr');
+  var outTypes = ['Caption','Graphic','Email','SMS','Prompt','Batch','Video','Carousel','Story'];
+  var decisions = ['Pending','Approved','Needs Edit','Regenerate','Hold','Send to Danielle','Ready to Schedule','Ready to Publish','Park This'];
+  var statuses = ['Pending Review','In Review','Approved','Rejected','Scheduled','Published'];
+  appendCells(tr, [
+    mkInput('Output name'), mkInput('Source SLP'), mkInput('Engine used'),
+    mkSelect(outTypes), mkSelect(PLATFORMS), mkInput('Generated link'),
+    mkSelect(decisions), mkSelect(YES_NO), mkSelect(YES_NO), mkInput('Notes'), mkSelect(statuses)
+  ]);
+  body.appendChild(tr); autoSave();
+}
+
+function addPublishRow() {
+  var body = document.getElementById('publish-body');
+  var tr = document.createElement('tr');
+  var pubStatuses = ['Draft','Ready to Publish','Scheduled','Published','Archived'];
+  appendCells(tr, [
+    mkInput('Asset'), mkInput('Campaign'), mkSelect(PLATFORMS), mkInput('Distribution channel'),
+    mkInput('Publish date'), mkInput('Caption / copy link'), mkInput('Final asset link'),
+    mkSelect(pubStatuses), mkSelect(YES_NO), mkInput('Perf. check date'), mkInput('Notes')
+  ]);
+  body.appendChild(tr); autoSave();
+}
+
+function addMetricsRow() {
+  var body = document.getElementById('metrics-body');
+  var tr = document.createElement('tr');
+  var contentTypes = ['Reel','Static','Story','Email','SMS','Video','Carousel','Pin','Website Block'];
+  var labels = ['Winner','Repeat This','Revise Hook','Revise Visual','Strong Visual / Weak CTA','Weak Offer','Needs More Data','Stop Doing This','Turn Into Template','Turn Into Campaign','Turn Into Engine'];
+  appendCells(tr, [
+    mkInput('Asset / content'), mkSelect(PLATFORMS), mkInput('Campaign'),
+    mkSelect(contentTypes), mkInput('Publish date'), mkInput('Views / reach'),
+    mkInput('Engagement'), mkInput('Saves'), mkInput('Shares'), mkInput('Comments'),
+    mkInput('Clicks'), mkInput('Bookings'), mkSelect(labels),
+    mkInput('What data says'), mkInput('Next move'), mkSelect(YES_NO), mkSelect(YES_NO)
+  ]);
+  body.appendChild(tr); autoSave();
+}
+
+function addArchiveRow() {
+  var body = document.getElementById('archive-body');
+  var tr = document.createElement('tr');
+  var archiveStatuses = ['Active Archive','Template Ready','Style Reference','Retired'];
+  appendCells(tr, [
+    mkInput('Asset name'), mkSelect(WORK_TYPES), mkInput('Campaign'),
+    mkInput('Final link'), mkInput('Canva link'), mkSelect(YES_NO), mkSelect(YES_NO),
+    mkInput('Prompt / style notes'), mkInput('Reuse notes'),
+    mkSelect(archiveStatuses), mkInput('Related engine')
+  ]);
+  body.appendChild(tr); autoSave();
+}
+
+function addDanielleRow() {
+  var body = document.getElementById('danielle-body');
+  var tr = document.createElement('tr');
+  var riskTypes = ['Pricing','Offer','Product Claim','Service Claim','Medical Claim','Skin Claim','Before / After','Client Sensitive','Controversy Risk','Brand Direction','Paid Tool','Launch Decision','Other'];
+  var statuses = ['Flagged','Sent to Danielle','Decision Pending','Approved','Rejected','Revised and Resubmitted'];
+  appendCells(tr, [
+    mkInput('Item description'), mkSelect(riskTypes), mkInput('Campaign'),
+    mkSelect(PLATFORMS), mkInput('Asset link'), mkInput('Context / background'),
+    mkInput('Celeste recommendation'), mkSelect(PRIORITIES), mkSelect(statuses),
+    mkInput('Danielle decision'), mkInput('Date flagged')
+  ]);
+  body.appendChild(tr); autoSave();
+}
+
+// ════════════════════════════════════════
+// ENGINE BUILDER
+// ════════════════════════════════════════
+var STARTER_ENGINES = [
+  {
+    name: 'HueVine Illustration Style Engine',
+    source: "Celeste's 30 existing illustrated graphics",
+    goal: 'Generate new HueVine-style illustrated content that matches existing brand aesthetic',
+    audience: 'HueVine clients and social followers',
+    offer: 'HueVine brand identity and service portfolio',
+    outputs: 'New matching illustrations, captions, story slides, carousel covers, post variations',
+    platforms: 'Instagram, Pinterest, TikTok, Facebook',
+    tool: 'ChatGPT Images, Canva, Open Generative AI',
+    metrics: 'Saves, shares, comments, engagement, repeatability',
+    decision: 'Testing',
+    status: 'Testing',
+    notes: 'Build the style bank from the 30 existing graphics first. Document prompt used for each output.'
+  },
+  {
+    name: 'Product Education Engine',
+    source: 'Product SLP or product fact sheet',
+    goal: 'Educate audience about HueVine products and drive product page visits and sales',
+    audience: 'Current and prospective HueVine clients',
+    offer: 'Power Gel, Purifying Pads, Ingrown Hair Annihilator, Pro Series',
+    outputs: 'Product graphic, reel script, caption, email block, SMS copy, Pinterest pin',
+    platforms: 'Instagram, TikTok, Email, SMS, Pinterest',
+    tool: 'Claude, ChatGPT Images, Canva',
+    metrics: 'Clicks, saves, sales signals, product page visits',
+    decision: 'Pending',
+    status: 'Idea',
+    notes: 'Start with Power Gel. One product at a time.'
+  },
+  {
+    name: 'Service Explainer Engine',
+    source: 'Service topic: laser hair removal, underarm resurfacing, peels, beard facial',
+    goal: 'Explain HueVine services clearly to drive bookings and consultations',
+    audience: 'Prospective clients researching services',
+    offer: 'Laser hair removal, underarm resurfacing, peels, beard facial',
+    outputs: 'Carousel, reel script, FAQ post, email, website blurb',
+    platforms: 'Instagram, TikTok, Email, Website',
+    tool: 'Claude, Canva',
+    metrics: 'Booking clicks, comments, saves, DMs',
+    decision: 'Pending',
+    status: 'Idea',
+    notes: 'Metric focus: booking clicks and DMs asking about services.'
+  },
+  {
+    name: 'Client Proof Engine',
+    source: 'Review, testimonial, transformation story, service result',
+    goal: 'Build trust and social proof to drive bookings and referrals',
+    audience: 'Prospective clients evaluating HueVine',
+    offer: 'All HueVine services',
+    outputs: 'Quote graphic, reel cover, caption, carousel, email proof block',
+    platforms: 'Instagram, Facebook, Email, TikTok',
+    tool: 'Canva, Claude',
+    metrics: 'Saves, shares, booking clicks, trust-building comments',
+    decision: 'Pending',
+    status: 'Idea',
+    notes: 'Consent gate required for before/after or identifiable client content. Flag all before/after to Danielle.'
+  },
+  {
+    name: 'Metrics-to-Next-Batch Engine',
+    source: 'Platform metrics from weekly review',
+    goal: 'Turn performance data into the next round of content tasks',
+    audience: 'Internal - Celeste uses this to plan next production batch',
+    offer: 'All HueVine content and services',
+    outputs: 'Next content tasks based on what performed this week',
+    platforms: 'All platforms',
+    tool: 'Manual review + Claude analysis',
+    metrics: 'Improvement in saves, clicks, bookings, sales signals over prior period',
+    decision: 'Pending',
+    status: 'Idea',
+    notes: 'Run this every Friday during metrics review. Feed output into next week Top 3.'
+  },
+  {
+    name: 'Longform-to-Shortform Engine',
+    source: 'YouTube video, podcast, transcript, live session, consultation teaching',
+    goal: 'Multiply longform content into many short-form outputs across platforms',
+    audience: 'HueVine social audience across all platforms',
+    offer: 'HueVine education, services, and products',
+    outputs: 'Clips, quote posts, reels, carousels, email tips, blog snippets',
+    platforms: 'YouTube Shorts, TikTok, Instagram, Email, Pinterest',
+    tool: 'Claude, n8n, Canva',
+    metrics: 'Watch time, saves, clicks, engagement',
+    decision: 'Pending',
+    status: 'Idea',
+    notes: 'Start with any existing YouTube content. One longform source should produce at least 5 outputs.'
+  },
+  {
+    name: 'Campaign Kit Engine',
+    source: 'One campaign SLP',
+    goal: 'Produce a complete visual and copy kit for any HueVine campaign from one brief',
+    audience: 'All HueVine audiences across all platforms',
+    offer: 'Campaign-specific offer or service',
+    outputs: 'Hero graphic, reel cover, story graphics, email header, SMS graphic, landing page banner, Pinterest pin, CTA graphic, recap post',
+    platforms: 'All platforms',
+    tool: 'ChatGPT Images, Canva, Claude',
+    metrics: 'Campaign completion, clicks, bookings, sales signal',
+    decision: 'Pending',
+    status: 'Idea',
+    notes: 'Goal: one SLP in, full campaign kit out. Test with next major campaign.'
+  }
+];
+
+function loadEngine(idx) {
+  var e = STARTER_ENGINES[idx];
+  if (!e) return;
+  var fields = { 'eb-name': e.name, 'eb-goal': e.goal, 'eb-source': e.source, 'eb-audience': e.audience,
+    'eb-offer': e.offer, 'eb-outputs': e.outputs, 'eb-platforms': e.platforms, 'eb-tool': e.tool,
+    'eb-metrics': e.metrics, 'eb-notes': e.notes };
+  Object.keys(fields).forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.value = fields[id];
+  });
+  var statusEl = document.getElementById('eb-status'); if (statusEl) statusEl.value = e.status;
+  showSection('engine-builder');
+}
+
+function saveEngineToLibrary() {
+  var name = (document.getElementById('eb-name') || {}).value;
+  if (!name) { alert('Engine name required.'); return; }
+  addEngineLibRow({
+    name: name,
+    source: (document.getElementById('eb-source') || {}).value,
+    outputs: (document.getElementById('eb-outputs') || {}).value,
+    tools: (document.getElementById('eb-tool') || {}).value,
+    status: (document.getElementById('eb-status') || {}).value,
+    tested: (document.getElementById('eb-tested') || {}).value,
+    notes: (document.getElementById('eb-notes') || {}).value
+  });
+  showSection('engine-library');
+}
+
+// ════════════════════════════════════════
+// QUEUE FILTER
+// ════════════════════════════════════════
+function filterQueue() {
+  var filter = (document.getElementById('queue-filter') || {}).value || 'all';
+  document.querySelectorAll('#queue-body tr').forEach(function(tr) {
+    var sel = tr.querySelector('td:nth-child(5) select');
+    tr.style.display = (!sel || filter === 'all' || sel.value === filter) ? '' : 'none';
+  });
+}
+
+// ════════════════════════════════════════
+// REPORT SAVE
+// ════════════════════════════════════════
+function saveReport() {
+  var ids = ['rpt-date','rpt-top3','rpt-sessions','rpt-poms','rpt-progress','rpt-blocked',
+    'rpt-auto','rpt-published','rpt-metrics-checked','rpt-archived','rpt-engine','rpt-tomorrow','rpt-danielle'];
+  var data = {};
+  ids.forEach(function(id) { var el = document.getElementById(id); if (el) data[id] = el.value; });
+  var dateKey = data['rpt-date'] || new Date().toISOString().split('T')[0];
+  localStorage.setItem('hv_report_' + dateKey, JSON.stringify(data));
+  flashSave();
+}
+
+// ════════════════════════════════════════
+// LOCALSTORAGE PERSISTENCE
+// ════════════════════════════════════════
+var saveTimeout = null;
+function autoSave() { clearTimeout(saveTimeout); saveTimeout = setTimeout(persistAll, 600); }
+
+function flashSave() {
+  var dot = document.getElementById('save-dot');
+  if (!dot) return;
+  dot.classList.add('show');
+  setTimeout(function() { dot.classList.remove('show'); }, 2000);
+}
+
+var TABLE_IDS = ['top3-body','queue-body','slp-body','engine-lib-body','auto-engines-body','auto-review-body','publish-body','metrics-body','archive-body','danielle-body','session-log'];
+
+function persistAll() {
+  TABLE_IDS.forEach(function(id) {
+    var body = document.getElementById(id);
+    if (!body) return;
+    var rows = [];
+    body.querySelectorAll('tr').forEach(function(tr) {
+      var cells = [];
+      tr.querySelectorAll('td').forEach(function(td) {
+        var inp = td.querySelector('input,select,textarea');
+        if (inp) cells.push({ t: inp.tagName, v: inp.value });
+        else cells.push({ t: 'TEXT', v: td.textContent });
+      });
+      rows.push(cells);
+    });
+    localStorage.setItem('hv_' + id, JSON.stringify(rows));
+  });
+  flashSave();
+}
+
+var ROW_ADDERS = {
+  'top3-body': addTop3Row, 'queue-body': addQueueRow, 'slp-body': addSLPRow,
+  'engine-lib-body': function() { addEngineLibRow({}); },
+  'auto-engines-body': function() { addAutoEngineRow({}); },
+  'auto-review-body': addAutoReviewRow, 'publish-body': addPublishRow,
+  'metrics-body': addMetricsRow, 'archive-body': addArchiveRow, 'danielle-body': addDanielleRow,
+  'session-log': null
+};
+
+function restoreAll() {
+  TABLE_IDS.forEach(function(id) {
+    var raw = localStorage.getItem('hv_' + id);
+    if (!raw) return;
+    var rows; try { rows = JSON.parse(raw); } catch(e) { return; }
+    var body = document.getElementById(id);
+    if (!body) return;
+    body.innerHTML = '';
+    rows.forEach(function(rowData) {
+      var adder = ROW_ADDERS[id];
+      if (adder) adder();
+      var lastRow = body.lastElementChild;
+      if (!lastRow) return;
+      var cells = lastRow.querySelectorAll('td');
+      rowData.forEach(function(cell, idx) {
+        if (!cells[idx]) return;
+        var inp = cells[idx].querySelector('input,select,textarea');
+        if (inp && cell.t !== 'TEXT') inp.value = cell.v || '';
+        else if (cell.t === 'TEXT' && cell.v && !cells[idx].querySelector('button')) {
+          cells[idx].textContent = cell.v;
+        }
+      });
+    });
+  });
+}
+
+// ════════════════════════════════════════
+// SEED STARTER DATA (first run only)
+// ════════════════════════════════════════
+function seedStarterData() {
+  // Pre-load the 7 engines into the library
+  STARTER_ENGINES.forEach(function(e) {
+    addEngineLibRow({ name: e.name, source: e.source, outputs: e.outputs, tools: e.tool, status: e.status, notes: e.notes });
+  });
+  // Pre-load automation tools
+  var tools = [
+    { name: 'Open Generative AI', type: 'Open Generative AI', purpose: 'AI image generation for HueVine branded visuals', useCase: 'Illustration style engine, product visuals, campaign graphics', status: 'Researching', cost: 'Unknown', license: 'Review commercial use terms before production use', setup: 'Research license options before first production use', secRisk: 'Low', brandRisk: 'Medium', reviewReq: 'Yes', owner: 'Celeste', next: 'Review license options and test with one illustration' },
+    { name: 'n8n MuAPI Nodes', type: 'n8n Workflow', link: '', purpose: 'Automate content distribution and data routing', useCase: 'Caption automation, metric collection, SLP routing, asset delivery', status: 'Testing', cost: 'API Cost', license: 'Open source n8n, MuAPI commercial license required', setup: 'Contact Danielle for n8n credentials', secRisk: 'Low', brandRisk: 'Low', reviewReq: 'Yes', owner: 'Danielle', next: 'Get n8n access from Danielle' },
+    { name: 'ChatGPT Images / OpenAI Image API', type: 'ChatGPT Images', link: 'https://platform.openai.com', purpose: 'AI-generated product and service visuals', useCase: 'Product Education Engine, Illustration Style Engine, Campaign Kit Engine', status: 'Testing', cost: 'API Cost', license: 'OpenAI commercial use allowed per TOS', setup: 'API key from Danielle', secRisk: 'Low', brandRisk: 'Medium', reviewReq: 'Yes', owner: 'Celeste', next: 'Test with one product visual for Power Gel' },
+    { name: 'Claude Code', type: 'Claude Code', link: 'https://claude.ai', purpose: 'Automate prompt-to-output workflows and engine building', useCase: 'Engine building, SLP processing, content batch generation, workspace management', status: 'Working', cost: 'API Cost', license: 'Anthropic commercial use allowed', setup: 'Active via OkLetsWork account', secRisk: 'Low', brandRisk: 'Low', reviewReq: 'Yes', owner: 'Danielle', next: 'Use for next engine build session' },
+    { name: 'Canva', type: 'Canva', link: 'https://canva.com', purpose: 'Brand-safe graphic design and template management', useCase: 'All graphic outputs, template bank, illustration modifications, campaign kits', status: 'Working', cost: 'Paid', license: 'Canva Pro commercial license active', setup: 'Login with HueVine account', secRisk: 'None', brandRisk: 'Low', reviewReq: 'No', owner: 'Celeste', next: 'Continue using for all graphics' },
+    { name: 'Google Drive', type: 'Other', link: 'https://drive.google.com', purpose: 'SLP storage, asset library, Danielle-to-Celeste file transfer', useCase: 'SLP intake, asset storage, shared brief delivery', status: 'Working', cost: 'Free', license: 'Google Workspace included', setup: 'Already active', secRisk: 'None', brandRisk: 'None', reviewReq: 'No', owner: 'Both', next: 'Continue using for all SLP transfers' },
+    { name: 'Social Platform Metrics Exports', type: 'Other', link: '', purpose: 'Pull weekly platform data for metrics review and engine decisions', useCase: 'Metrics + Next Moves, Metrics-to-Next-Batch Engine', status: 'Working', cost: 'Free', license: 'Native platform exports', setup: 'Manual weekly export from each platform', secRisk: 'None', brandRisk: 'None', reviewReq: 'No', owner: 'Celeste', next: 'Set up Friday metrics review routine' }
+  ];
+  tools.forEach(function(t) { addAutoEngineRow(t); });
+}
+
+// ════════════════════════════════════════
+// DASHBOARD RENDER
+// ════════════════════════════════════════
+function renderDashboard() {
+  var top3Body = document.getElementById('top3-body');
+  var doneCount = 0, queueWeekDone = 0;
+  if (top3Body) {
+    top3Body.querySelectorAll('tr').forEach(function(tr) {
+      var sel = tr.querySelector('td:nth-child(8) select');
+      if (sel && sel.value === 'Done') doneCount++;
+    });
+  }
+  var d3 = document.getElementById('dash-top3'); if (d3) d3.textContent = doneCount + '/3';
+
+  var reviewBody = document.getElementById('auto-review-body');
+  var reviewCount = 0;
+  if (reviewBody) {
+    reviewBody.querySelectorAll('tr').forEach(function(tr) {
+      var sel = tr.querySelector('td:nth-child(7) select');
+      if (sel && sel.value === 'Pending') reviewCount++;
+    });
+  }
+  var dr = document.getElementById('dash-review'); if (dr) dr.textContent = reviewCount;
+
+  var publishBody = document.getElementById('publish-body');
+  var pubCount = 0;
+  if (publishBody) {
+    publishBody.querySelectorAll('tr').forEach(function(tr) {
+      var sel = tr.querySelector('td:nth-child(8) select');
+      if (sel && sel.value === 'Ready to Publish') pubCount++;
+    });
+  }
+  var dp = document.getElementById('dash-publish'); if (dp) dp.textContent = pubCount;
+
+  var queueBody = document.getElementById('queue-body');
+  var blockedCount = 0;
+  if (queueBody) {
+    queueBody.querySelectorAll('tr').forEach(function(tr) {
+      var sel = tr.querySelector('td:nth-child(5) select');
+      if (sel && sel.value === 'Blocked') blockedCount++;
+      if (sel && sel.value === 'Done') queueWeekDone++;
+    });
+  }
+  var db = document.getElementById('dash-blocked'); if (db) db.textContent = blockedCount;
+  var ds = document.getElementById('dash-sessions'); if (ds) ds.textContent = T.sessions;
+  var dw = document.getElementById('dash-week-done'); if (dw) dw.textContent = queueWeekDone;
+}
+
+// ════════════════════════════════════════
+// PROJECTS — Task Boards + Claude Code / Cursor Export
+// ════════════════════════════════════════
+var PRJ_STATUSES = ['Active','In Progress','Blocked','In Review','Ready to Publish','Done','Parked'];
+var PRJ_PRIORITIES = ['ASAP','High','Medium','Low'];
+var PRJ_WORKTYPES = ['Repeatable','Original','Hybrid'];
+var PRJ_CAMPAIGNS = ['General','Product Launch','Service Campaign','Client Proof','Engine Build','Social Growth','Email Campaign','Event'];
+
+var prjData = []; // array of project objects
+
+function prjLoad() {
+  var raw = localStorage.getItem('hv_projects');
+  if (raw) { try { prjData = JSON.parse(raw); } catch(e) { prjData = []; } }
+  prjRenderAll();
+}
+
+function prjSave() {
+  localStorage.setItem('hv_projects', JSON.stringify(prjData));
+  flashSave();
+}
+
+function prjMakeId() {
+  return 'prj_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+}
+
+function prjAddProject() {
+  var today = new Date();
+  var due = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+  var dueStr = due.toISOString().split('T')[0];
+  var newPrj = {
+    id: prjMakeId(),
+    name: 'New Project',
+    campaign: 'General',
+    workType: 'Hybrid',
+    priority: 'Medium',
+    status: 'Active',
+    dueDate: dueStr,
+    goal: '',
+    assetLink: '',
+    driveLink: '',
+    notes: '',
+    open: true,
+    tasks: []
+  };
+  prjData.unshift(newPrj);
+  prjSave();
+  prjRenderAll();
+  // Focus name field after render
+  setTimeout(function() {
+    var el = document.querySelector('[data-prj-field="name"][data-prj-id="' + newPrj.id + '"]');
+    if (el) { el.focus(); el.select(); }
+  }, 50);
+}
+
+function prjDeleteProject(id) {
+  if (!confirm('Delete this project and all its tasks?')) return;
+  prjData = prjData.filter(function(p) { return p.id !== id; });
+  prjSave();
+  prjRenderAll();
+}
+
+function prjToggleOpen(id) {
+  var prj = prjData.find(function(p) { return p.id === id; });
+  if (prj) { prj.open = !prj.open; prjSave(); prjRenderAll(); }
+}
+
+function prjUpdateField(id, field, value) {
+  var prj = prjData.find(function(p) { return p.id === id; });
+  if (!prj) return;
+  prj[field] = value;
+  prjSave();
+  // Re-render header only for visual fields
+  if (['name','status','priority','dueDate','campaign'].indexOf(field) !== -1) {
+    prjRenderCard(prj, true);
+  }
+}
+
+function prjAddTask(id, inputEl) {
+  var text = inputEl ? inputEl.value.trim() : '';
+  if (!text) return;
+  var prj = prjData.find(function(p) { return p.id === id; });
+  if (!prj) return;
+  prj.tasks.push({ id: prjMakeId(), text: text, done: false, priority: 'Normal' });
+  inputEl.value = '';
+  prjSave();
+  prjRenderAll();
+}
+
+function prjToggleTask(prjId, taskId) {
+  var prj = prjData.find(function(p) { return p.id === prjId; });
+  if (!prj) return;
+  var task = prj.tasks.find(function(t) { return t.id === taskId; });
+  if (task) { task.done = !task.done; prjSave(); prjRenderAll(); }
+}
+
+function prjUpdateTaskText(prjId, taskId, value) {
+  var prj = prjData.find(function(p) { return p.id === prjId; });
+  if (!prj) return;
+  var task = prj.tasks.find(function(t) { return t.id === taskId; });
+  if (task) { task.text = value; prjSave(); }
+}
+
+function prjDeleteTask(prjId, taskId) {
+  var prj = prjData.find(function(p) { return p.id === prjId; });
+  if (!prj) return;
+  prj.tasks = prj.tasks.filter(function(t) { return t.id !== taskId; });
+  prjSave();
+  prjRenderAll();
+}
+
+function prjDueBadgeClass(dueDate) {
+  if (!dueDate) return 'ok';
+  var now = new Date(); now.setHours(0,0,0,0);
+  var due = new Date(dueDate);
+  var diff = Math.round((due - now) / 86400000);
+  if (diff < 0) return 'overdue';
+  if (diff <= 3) return 'soon';
+  return 'ok';
+}
+
+function prjStatusClass(status) {
+  var map = {
+    'Active': 'prj-status-active',
+    'In Progress': 'prj-status-active',
+    'Blocked': 'prj-status-blocked',
+    'In Review': 'prj-status-review',
+    'Ready to Publish': 'prj-status-review',
+    'Done': 'prj-status-done',
+    'Parked': 'prj-status-done'
+  };
+  return map[status] || 'prj-status-done';
+}
+
+function prjPriorityClass(priority) {
+  var map = { 'ASAP': 'prj-asap', 'High': 'prj-high', 'Medium': 'prj-medium', 'Low': 'prj-low' };
+  return map[priority] || 'prj-low';
+}
+
+function prjRenderAll() {
+  var grid = document.getElementById('prj-grid');
+  var empty = document.getElementById('prj-empty');
+  var badge = document.getElementById('prj-count-badge');
+  if (!grid) return;
+
+  var filterStatus = (document.getElementById('prj-filter-status') || {}).value || '';
+  var filterPri = (document.getElementById('prj-filter-priority') || {}).value || '';
+
+  var filtered = prjData.filter(function(p) {
+    if (filterStatus && p.status !== filterStatus) return false;
+    if (filterPri && p.priority !== filterPri) return false;
+    return true;
+  });
+
+  if (prjData.length === 0) {
+    grid.innerHTML = '';
+    if (empty) empty.style.display = 'block';
+    if (badge) badge.textContent = '';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  var activeCount = prjData.filter(function(p) { return p.status === 'Active' || p.status === 'In Progress'; }).length;
+  var doneCount = prjData.filter(function(p) { return p.status === 'Done'; }).length;
+  if (badge) badge.textContent = activeCount + ' active  |  ' + doneCount + ' done  |  ' + prjData.length + ' total';
+
+  var html = '';
+  filtered.forEach(function(prj) {
+    var doneTasks = prj.tasks.filter(function(t) { return t.done; }).length;
+    var totalTasks = prj.tasks.length;
+    var pct = totalTasks > 0 ? Math.round(doneTasks / totalTasks * 100) : 0;
+    var dueCls = prjDueBadgeClass(prj.dueDate);
+    var dueLabel = prj.dueDate ? prj.dueDate : 'No date';
+    var daysLeft = '';
+    if (prj.dueDate) {
+      var now = new Date(); now.setHours(0,0,0,0);
+      var diff = Math.round((new Date(prj.dueDate) - now) / 86400000);
+      daysLeft = diff < 0 ? ' (' + Math.abs(diff) + 'd late)' : diff === 0 ? ' (today)' : ' (' + diff + 'd)';
+    }
+
+    html += '<div class="prj-card ' + prjPriorityClass(prj.priority) + (prj.open ? ' open' : '') + '" id="prjcard-' + prj.id + '">';
+
+    // Header row
+    html += '<div class="prj-header" onclick="prjToggleOpen(\'' + prj.id + '\')">';
+    html += '<span class="prj-chevron">▶</span>';
+    html += '<div class="prj-name-block">';
+    html += '<div class="prj-name">' + (prj.name || 'Untitled Project') + '</div>';
+    html += '<div class="prj-sub">' + (prj.campaign || '') + (prj.workType ? '  ·  ' + prj.workType : '') + (totalTasks > 0 ? '  ·  ' + doneTasks + '/' + totalTasks + ' tasks' : '') + '</div>';
+    html += '</div>';
+    html += '<div class="prj-meta">';
+    html += '<span class="prj-due ' + dueCls + '">' + dueLabel + daysLeft + '</span>';
+    html += '<span class="prj-status-badge ' + prjStatusClass(prj.status) + '">' + (prj.status || 'Active') + '</span>';
+    html += '<div class="prj-export-btns" onclick="event.stopPropagation()">';
+    html += '<button class="prj-export-btn" title="Copy prompt for Claude Code" onclick="prjExport(\'' + prj.id + '\',\'claude\')">Claude Code</button>';
+    html += '<button class="prj-export-btn cursor-btn" title="Copy markdown spec for Cursor" onclick="prjExport(\'' + prj.id + '\',\'cursor\')">Cursor</button>';
+    html += '</div>';
+    html += '<button class="prj-del-btn" onclick="event.stopPropagation();prjDeleteProject(\'' + prj.id + '\')" title="Delete project">✕</button>';
+    html += '</div>';
+    html += '</div>'; // end header
+
+    // Progress bar
+    if (totalTasks > 0) {
+      html += '<div class="prj-progress-bar" style="margin:0;border-radius:0;height:2px"><div class="prj-progress-fill" style="width:' + pct + '%"></div></div>';
+    }
+
+    // Body (visible when open)
+    html += '<div class="prj-body">';
+
+    // Meta fields grid
+    html += '<div class="prj-fields">';
+    // Name
+    html += '<div class="prj-field-wrap" style="grid-column:1/3"><div class="prj-field-label">Project Name</div>';
+    html += '<input class="prj-field-input" data-prj-id="' + prj.id + '" data-prj-field="name" value="' + prj.name.replace(/"/g,'&quot;') + '" placeholder="Project name" onchange="prjUpdateField(\'' + prj.id + '\',\'name\',this.value)"></div>';
+    // Status
+    html += '<div class="prj-field-wrap"><div class="prj-field-label">Status</div>';
+    html += '<select class="prj-field-input" onchange="prjUpdateField(\'' + prj.id + '\',\'status\',this.value)">';
+    PRJ_STATUSES.forEach(function(s) { html += '<option value="' + s + '"' + (prj.status === s ? ' selected' : '') + '>' + s + '</option>'; });
+    html += '</select></div>';
+    // Priority
+    html += '<div class="prj-field-wrap"><div class="prj-field-label">Priority</div>';
+    html += '<select class="prj-field-input" onchange="prjUpdateField(\'' + prj.id + '\',\'priority\',this.value)">';
+    PRJ_PRIORITIES.forEach(function(p) { html += '<option value="' + p + '"' + (prj.priority === p ? ' selected' : '') + '>' + p + '</option>'; });
+    html += '</select></div>';
+    // Due Date
+    html += '<div class="prj-field-wrap"><div class="prj-field-label">Due Date</div>';
+    html += '<input type="date" class="prj-field-input" value="' + (prj.dueDate || '') + '" onchange="prjUpdateField(\'' + prj.id + '\',\'dueDate\',this.value)"></div>';
+    // Campaign
+    html += '<div class="prj-field-wrap"><div class="prj-field-label">Campaign</div>';
+    html += '<select class="prj-field-input" onchange="prjUpdateField(\'' + prj.id + '\',\'campaign\',this.value)">';
+    PRJ_CAMPAIGNS.forEach(function(c) { html += '<option value="' + c + '"' + (prj.campaign === c ? ' selected' : '') + '>' + c + '</option>'; });
+    html += '</select></div>';
+    // Work Type
+    html += '<div class="prj-field-wrap"><div class="prj-field-label">Work Type</div>';
+    html += '<select class="prj-field-input" onchange="prjUpdateField(\'' + prj.id + '\',\'workType\',this.value)">';
+    PRJ_WORKTYPES.forEach(function(w) { html += '<option value="' + w + '"' + (prj.workType === w ? ' selected' : '') + '>' + w + '</option>'; });
+    html += '</select></div>';
+    // Goal
+    html += '<div class="prj-field-wrap" style="grid-column:1/-1"><div class="prj-field-label">Goal / Description</div>';
+    html += '<input class="prj-field-input" value="' + (prj.goal || '').replace(/"/g,'&quot;') + '" placeholder="What does done look like for this project?" onchange="prjUpdateField(\'' + prj.id + '\',\'goal\',this.value)"></div>';
+    // Asset Link
+    html += '<div class="prj-field-wrap"><div class="prj-field-label">Final Asset Link</div>';
+    html += '<input class="prj-field-input" value="' + (prj.assetLink || '').replace(/"/g,'&quot;') + '" placeholder="Canva, Drive, Figma..." onchange="prjUpdateField(\'' + prj.id + '\',\'assetLink\',this.value)"></div>';
+    // Drive Link
+    html += '<div class="prj-field-wrap"><div class="prj-field-label">Google Drive / SLP Link</div>';
+    html += '<input class="prj-field-input" value="' + (prj.driveLink || '').replace(/"/g,'&quot;') + '" placeholder="Source doc, brief, SLP..." onchange="prjUpdateField(\'' + prj.id + '\',\'driveLink\',this.value)"></div>';
+    // Notes
+    html += '<div class="prj-field-wrap"><div class="prj-field-label">Notes</div>';
+    html += '<input class="prj-field-input" value="' + (prj.notes || '').replace(/"/g,'&quot;') + '" placeholder="Context, blockers, ideas..." onchange="prjUpdateField(\'' + prj.id + '\',\'notes\',this.value)"></div>';
+    html += '</div>'; // end prj-fields
+
+    // Tasks
+    html += '<div class="prj-tasks-label">';
+    html += '<span>Tasks  <span style="font-weight:500;color:var(--text-mid)">' + doneTasks + '/' + totalTasks + '</span></span>';
+    if (totalTasks > 0) html += '<span style="font-weight:600;color:' + (pct === 100 ? 'var(--green)' : 'var(--text-mid)') + '">' + pct + '%</span>';
+    html += '</div>';
+    html += '<div class="prj-task-list" id="prj-tasks-' + prj.id + '">';
+    if (prj.tasks.length === 0) {
+      html += '<div style="font-size:12px;color:var(--text-muted);padding:8px 0">No tasks yet. Add the first one below.</div>';
+    } else {
+      prj.tasks.forEach(function(task) {
+        html += '<div class="prj-task-row' + (task.done ? ' done-task' : '') + '" id="prjtask-' + task.id + '">';
+        html += '<input type="checkbox" class="prj-task-check"' + (task.done ? ' checked' : '') + ' onchange="prjToggleTask(\'' + prj.id + '\',\'' + task.id + '\')">';
+        html += '<input type="text" class="prj-task-text" value="' + task.text.replace(/"/g,'&quot;') + '" onchange="prjUpdateTaskText(\'' + prj.id + '\',\'' + task.id + '\',this.value)" onblur="prjUpdateTaskText(\'' + prj.id + '\',\'' + task.id + '\',this.value)">';
+        html += '<button class="prj-task-del" onclick="prjDeleteTask(\'' + prj.id + '\',\'' + task.id + '\')" title="Remove task">✕</button>';
+        html += '</div>';
+      });
+    }
+    html += '</div>';
+
+    // Add task row
+    html += '<div class="prj-add-task-row">';
+    html += '<input class="prj-add-task-input" id="prj-newtask-' + prj.id + '" placeholder="Add a task..." onkeydown="if(event.key===\'Enter\')prjAddTask(\'' + prj.id + '\',this)">';
+    html += '<button class="prj-add-task-btn" onclick="prjAddTask(\'' + prj.id + '\',document.getElementById(\'prj-newtask-' + prj.id + '\'))">Add Task</button>';
+    html += '</div>';
+
+    html += '</div>'; // end body
+    html += '</div>'; // end card
+  });
+
+  grid.innerHTML = html;
+}
+
+function prjRenderCard(prj, headerOnly) {
+  // Lightweight re-render — just replace the card
+  prjRenderAll();
+}
+
+function prjShowToast(msg) {
+  var t = document.getElementById('prj-copy-toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2800);
+}
+
+function prjExport(id, target) {
+  var prj = prjData.find(function(p) { return p.id === id; });
+  if (!prj) return;
+
+  var doneTasks = prj.tasks.filter(function(t) { return t.done; });
+  var openTasks = prj.tasks.filter(function(t) { return !t.done; });
+
+  var taskLines = '';
+  openTasks.forEach(function(t) { taskLines += '- [ ] ' + t.text + '\n'; });
+  doneTasks.forEach(function(t) { taskLines += '- [x] ' + t.text + '\n'; });
+
+  var daysLeft = '';
+  if (prj.dueDate) {
+    var now = new Date(); now.setHours(0,0,0,0);
+    var diff = Math.round((new Date(prj.dueDate) - now) / 86400000);
+    daysLeft = diff < 0 ? '  (' + Math.abs(diff) + ' days overdue)' : diff === 0 ? '  (due today)' : '  (' + diff + ' days remaining)';
+  }
+
+  var prompt = '';
+
+  if (target === 'claude') {
+    prompt = '# ' + (prj.name || 'Project') + '\n\n';
+    prompt += '**Client:** HueVine MedSpa  |  **Creative Director:** Celeste\n';
+    prompt += '**Priority:** ' + (prj.priority || 'Medium') + '  |  **Due:** ' + (prj.dueDate || 'TBD') + daysLeft + '\n';
+    prompt += '**Campaign:** ' + (prj.campaign || 'General') + '  |  **Work Type:** ' + (prj.workType || 'Hybrid') + '\n';
+    prompt += '**Status:** ' + (prj.status || 'Active') + '\n\n';
+    if (prj.goal) { prompt += '## Goal\n' + prj.goal + '\n\n'; }
+    prompt += '## Tasks\n';
+    if (taskLines) { prompt += taskLines + '\n'; }
+    else { prompt += 'No tasks defined yet.\n\n'; }
+    if (prj.assetLink) { prompt += '## Final Asset\n' + prj.assetLink + '\n\n'; }
+    if (prj.driveLink) { prompt += '## Source / SLP\n' + prj.driveLink + '\n\n'; }
+    if (prj.notes) { prompt += '## Notes\n' + prj.notes + '\n\n'; }
+    prompt += '---\n';
+    prompt += 'Please help me complete the open tasks above for this HueVine creative project. ';
+    prompt += 'Start with the highest priority incomplete task. ';
+    prompt += 'Ask clarifying questions before beginning if anything is ambiguous. ';
+    prompt += 'Keep outputs on-brand for HueVine MedSpa: clean, confident, direct, not clinical.';
+    prjShowToast('Claude Code prompt copied — paste into claude.ai or Claude Code');
+  } else {
+    // Cursor — clean markdown spec file
+    prompt = '---\n';
+    prompt += 'project: ' + (prj.name || 'Project') + '\n';
+    prompt += 'client: HueVine MedSpa\n';
+    prompt += 'creative_director: Celeste\n';
+    prompt += 'priority: ' + (prj.priority || 'Medium') + '\n';
+    prompt += 'due: ' + (prj.dueDate || 'TBD') + '\n';
+    prompt += 'campaign: ' + (prj.campaign || 'General') + '\n';
+    prompt += 'work_type: ' + (prj.workType || 'Hybrid') + '\n';
+    prompt += 'status: ' + (prj.status || 'Active') + '\n';
+    prompt += '---\n\n';
+    prompt += '# ' + (prj.name || 'Project') + '\n\n';
+    if (prj.goal) { prompt += '## Goal\n> ' + prj.goal + '\n\n'; }
+    prompt += '## Tasks\n';
+    if (taskLines) { prompt += taskLines + '\n'; }
+    if (openTasks.length > 0) {
+      prompt += '### Open: ' + openTasks.length + ' remaining\n';
+      prompt += '### Done: ' + doneTasks.length + ' completed\n\n';
+    }
+    if (prj.assetLink) { prompt += '## Final Asset Link\n' + prj.assetLink + '\n\n'; }
+    if (prj.driveLink) { prompt += '## Source / SLP Link\n' + prj.driveLink + '\n\n'; }
+    if (prj.notes) { prompt += '## Notes\n' + prj.notes + '\n\n'; }
+    prompt += '## Context\n';
+    prompt += 'HueVine MedSpa, Southfield MI. Services: laser hair removal, underarm resurfacing, chemical peels, beard facials.\n';
+    prompt += 'Products: Power Gel, Purifying Pads, Ingrown Hair Annihilator, Pro Series.\n';
+    prompt += 'Brand voice: clean, confident, direct. Not clinical. Not corporate.\n';
+    prjShowToast('Cursor spec copied — paste into a .md file in your Cursor project');
+  }
+
+  // Copy to clipboard
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(prompt).catch(function() { prjFallbackCopy(prompt); });
+  } else {
+    prjFallbackCopy(prompt);
+  }
+}
+
+function prjFallbackCopy(text) {
+  var el = document.createElement('textarea');
+  el.value = text;
+  el.style.position = 'fixed';
+  el.style.opacity = '0';
+  document.body.appendChild(el);
+  el.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(el);
+}
+
+// ════════════════════════════════════════
+// SOCIAL GROWTH DASHBOARD
+// ════════════════════════════════════════
+var SG_PLATFORMS = [
+  { id: 'instagram', name: 'Instagram', fields: ['Followers','Posts Published','Quality Posts','Reach','Saves','Shares','Comments','Bookings'] },
+  { id: 'tiktok',    name: 'TikTok',    fields: ['Followers','Videos Published','Quality Videos','Views','Saves','Shares','Comments','Profile Visits'] },
+  { id: 'youtube',   name: 'YouTube',   fields: ['Subscribers','Videos Published','Quality Videos','Views','Watch Time (hrs)','Saves','Comments','Clicks'] },
+  { id: 'pinterest', name: 'Pinterest', fields: ['Followers','Pins Published','Quality Pins','Impressions','Saves','Outbound Clicks','Engagement','Profile Visits'] },
+  { id: 'facebook',  name: 'Facebook',  fields: ['Followers','Posts Published','Quality Posts','Reach','Engagements','Saves','Shares','Clicks'] },
+  { id: 'email',     name: 'Email',     fields: ['List Size','Sends','Open Rate %','Click Rate %','Quality Sends','Unsubscribes','Revenue Attributed','New Subscribers'] },
+  { id: 'sms',       name: 'SMS',       fields: ['List Size','Sends','Click Rate %','Quality Sends','Opt-outs','Revenue Attributed','New Subscribers','Replies'] }
+];
+
+// Quality metric index for each platform (0-based index in fields array)
+var SG_QUALITY_IDX = { instagram: 2, tiktok: 2, youtube: 2, pinterest: 2, facebook: 2, email: 4, sms: 3 };
+
+var sgWeeks = [];      // array of week objects { date, data: { platformId: [values] } }
+var sgBaseline = {};   // { platformId: qualityCount }
+var sgCurrentWeek = 0; // index into sgWeeks
+
+function sgLoad() {
+  var raw = localStorage.getItem('hv_sg_weeks');
+  if (raw) { try { sgWeeks = JSON.parse(raw); } catch(e) { sgWeeks = []; } }
+  var rawB = localStorage.getItem('hv_sg_baseline');
+  if (rawB) { try { sgBaseline = JSON.parse(rawB); } catch(e) { sgBaseline = {}; } }
+  var rawN = localStorage.getItem('hv_sg_notes');
+  if (rawN) {
+    try {
+      var n = JSON.parse(rawN);
+      var els = { working: 'sg-working', stop: 'sg-stop', engine: 'sg-engine-opp', focus: 'sg-next-focus' };
+      Object.keys(els).forEach(function(k) { var el = document.getElementById(els[k]); if (el && n[k]) el.value = n[k]; });
+    } catch(e) {}
+  }
+  sgRenderAll();
+}
+
+function sgSave() {
+  localStorage.setItem('hv_sg_weeks', JSON.stringify(sgWeeks));
+  localStorage.setItem('hv_sg_baseline', JSON.stringify(sgBaseline));
+  flashSave();
+}
+
+function sgSaveNotes() {
+  var data = {
+    working: (document.getElementById('sg-working') || {}).value || '',
+    stop: (document.getElementById('sg-stop') || {}).value || '',
+    engine: (document.getElementById('sg-engine-opp') || {}).value || '',
+    focus: (document.getElementById('sg-next-focus') || {}).value || ''
+  };
+  localStorage.setItem('hv_sg_notes', JSON.stringify(data));
+  flashSave();
+}
+
+function sgSetBaseline() {
+  if (sgWeeks.length === 0) {
+    alert('Add at least one weekly snapshot first, then set it as your baseline.');
+    return;
+  }
+  var week = sgWeeks[sgCurrentWeek];
+  var msg = 'Set week of ' + week.date + ' as your 10X baseline? This becomes the starting point. Your goal will be 10X the quality content per platform per week.';
+  if (!confirm(msg)) return;
+  SG_PLATFORMS.forEach(function(p) {
+    var vals = (week.data && week.data[p.id]) ? week.data[p.id] : [];
+    var qIdx = SG_QUALITY_IDX[p.id];
+    sgBaseline[p.id] = parseFloat(vals[qIdx]) || 0;
+  });
+  sgSave();
+  sgRender10xProgress();
+  alert('Baseline set. Your 10X goal has been calculated.');
+}
+
+function sgAddWeek() {
+  var today = new Date();
+  var monday = new Date(today);
+  monday.setDate(today.getDate() - today.getDay() + 1);
+  var dateStr = monday.toISOString().split('T')[0];
+  // Check if this week already exists
+  for (var i = 0; i < sgWeeks.length; i++) {
+    if (sgWeeks[i].date === dateStr) {
+      sgCurrentWeek = i;
+      sgRenderAll();
+      return;
+    }
+  }
+  var newWeek = { date: dateStr, data: {} };
+  SG_PLATFORMS.forEach(function(p) { newWeek.data[p.id] = new Array(p.fields.length).fill(''); });
+  sgWeeks.unshift(newWeek); // newest first
+  sgCurrentWeek = 0;
+  sgSave();
+  sgRenderAll();
+}
+
+function sgSelectWeek(idx) {
+  sgCurrentWeek = idx;
+  sgRenderWeekContent();
+  sgRenderWeekTabs();
+  sgUpdateHistory();
+}
+
+function sgRenderAll() {
+  sgRenderWeekTabs();
+  sgRenderWeekContent();
+  sgRender10xProgress();
+  sgUpdateHistory();
+}
+
+function sgRenderWeekTabs() {
+  var container = document.getElementById('sg-week-tabs');
+  if (!container) return;
+  container.innerHTML = '';
+  sgWeeks.forEach(function(w, i) {
+    var btn = document.createElement('button');
+    btn.className = 'sg-week-tab' + (i === sgCurrentWeek ? ' active' : '');
+    btn.textContent = 'Week of ' + w.date;
+    btn.onclick = (function(idx) { return function() { sgSelectWeek(idx); }; })(i);
+    container.appendChild(btn);
+  });
+}
+
+function sgRenderWeekContent() {
+  var container = document.getElementById('sg-week-content');
+  if (!container) return;
+  if (sgWeeks.length === 0) {
+    container.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:16px;background:var(--card);border-radius:var(--r-lg);border:1px solid var(--border)">Click <strong>+ New Week</strong> to log this week.</div>';
+    return;
+  }
+  var week = sgWeeks[sgCurrentWeek];
+  var priorWeek = sgCurrentWeek < sgWeeks.length - 1 ? sgWeeks[sgCurrentWeek + 1] : null;
+
+  var html = '<div class="sg-platform-grid">';
+  SG_PLATFORMS.forEach(function(p) {
+    var vals = week.data[p.id] || [];
+    var priorVals = priorWeek ? (priorWeek.data[p.id] || []) : [];
+    var qIdx = SG_QUALITY_IDX[p.id];
+    var currQ = parseFloat(vals[qIdx]) || 0;
+    var priorQ = parseFloat(priorVals[qIdx]) || 0;
+    var change = priorWeek && priorQ > 0 ? ((currQ - priorQ) / priorQ * 100).toFixed(0) : null;
+    var changeHtml = change !== null
+      ? '<span class="sg-plat-change ' + (change > 0 ? 'up' : change < 0 ? 'down' : 'flat') + '">' + (change > 0 ? '+' : '') + change + '% WoW</span>'
+      : '<span class="sg-plat-change flat">No prior week</span>';
+
+    html += '<div class="sg-platform-card">';
+    html += '<div class="sg-plat-header"><div class="sg-plat-name">' + p.name + '</div>' + changeHtml + '</div>';
+    html += '<div class="sg-plat-fields">';
+    p.fields.forEach(function(f, fi) {
+      var isQuality = fi === qIdx;
+      html += '<div class="sg-plat-field"' + (isQuality ? ' style="background:var(--accent-dim);border-color:var(--accent)"' : '') + '>';
+      html += '<div class="sg-plat-label">' + f + (isQuality ? ' [QUALITY]' : '') + '</div>';
+      html += '<input class="sg-plat-input" type="number" min="0" data-platform="' + p.id + '" data-fi="' + fi + '" value="' + (vals[fi] || '') + '" placeholder="0" onchange="sgUpdateField(this)" oninput="sgUpdateField(this)">';
+      html += '</div>';
+    });
+    html += '</div></div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function sgUpdateField(input) {
+  if (sgWeeks.length === 0) return;
+  var week = sgWeeks[sgCurrentWeek];
+  var pid = input.getAttribute('data-platform');
+  var fi = parseInt(input.getAttribute('data-fi'));
+  if (!week.data[pid]) week.data[pid] = [];
+  week.data[pid][fi] = input.value;
+  sgSave();
+  sgRender10xProgress();
+  sgUpdateHistory();
+}
+
+function sgRender10xProgress() {
+  var container = document.getElementById('sg-10x-grid');
+  if (!container) return;
+  if (sgWeeks.length === 0 || Object.keys(sgBaseline).length === 0) {
+    container.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:16px">Set your baseline to see 10X progress here.</div>';
+    return;
+  }
+  var week = sgWeeks[sgCurrentWeek];
+  var html = '';
+  var totalCurrent = 0, totalGoal = 0;
+
+  SG_PLATFORMS.forEach(function(p) {
+    var base = sgBaseline[p.id] || 0;
+    var goal = base * 10;
+    var vals = week.data[p.id] || [];
+    var qIdx = SG_QUALITY_IDX[p.id];
+    var current = parseFloat(vals[qIdx]) || 0;
+    var pct = goal > 0 ? Math.min(100, (current / goal * 100)) : 0;
+    var weeksData = sgWeeks.map(function(w) { return parseFloat((w.data[p.id] || [])[qIdx]) || 0; });
+    var avgGrowth = weeksData.length > 1 ? (weeksData[0] - weeksData[weeksData.length - 1]) / (weeksData.length - 1) : 0;
+    var projWeeks = avgGrowth > 0 ? Math.ceil((goal - current) / avgGrowth) : null;
+    totalCurrent += current; totalGoal += goal;
+
+    html += '<div class="sg-10x-card" style="--prog:' + pct.toFixed(1) + '%">';
+    html += '<div class="sg-10x-platform">' + p.name + '</div>';
+    html += '<div class="sg-10x-current">' + current + '</div>';
+    html += '<div class="sg-10x-goal">Goal: ' + goal + ' quality pieces/wk</div>';
+    html += '<div class="sg-10x-pct">' + pct.toFixed(0) + '% of 10X</div>';
+    if (projWeeks && current < goal) {
+      html += '<div class="sg-10x-proj">At this pace: ~' + projWeeks + ' weeks</div>';
+    } else if (current >= goal) {
+      html += '<div class="sg-10x-proj" style="color:var(--green);font-weight:700">10X REACHED</div>';
+    } else {
+      html += '<div class="sg-10x-proj">Grow consistently to project</div>';
+    }
+    html += '</div>';
+  });
+
+  // Total card
+  var totalPct = totalGoal > 0 ? Math.min(100, totalCurrent / totalGoal * 100) : 0;
+  html += '<div class="sg-10x-card" style="--prog:' + totalPct.toFixed(1) + '%;border-color:var(--accent)">';
+  html += '<div class="sg-10x-platform" style="color:var(--accent)">All Platforms</div>';
+  html += '<div class="sg-10x-current" style="color:var(--accent)">' + totalCurrent + '</div>';
+  html += '<div class="sg-10x-goal">Combined goal: ' + totalGoal + '/wk</div>';
+  html += '<div class="sg-10x-pct" style="font-size:16px">' + totalPct.toFixed(0) + '% of 10X</div>';
+  html += '</div>';
+
+  container.innerHTML = html;
+}
+
+function sgUpdateHistory() {
+  var body = document.getElementById('sg-history-body');
+  if (!body) return;
+  if (sgWeeks.length < 2) { body.innerHTML = ''; return; }
+
+  var rows = '';
+  sgWeeks.forEach(function(week, wi) {
+    var prior = wi < sgWeeks.length - 1 ? sgWeeks[wi + 1] : null;
+    var qualityCounts = SG_PLATFORMS.map(function(p) {
+      var qIdx = SG_QUALITY_IDX[p.id];
+      return parseFloat((week.data[p.id] || [])[qIdx]) || 0;
+    });
+    var totalQ = qualityCounts.reduce(function(a, b) { return a + b; }, 0);
+    var priorTotalQ = prior ? SG_PLATFORMS.reduce(function(sum, p) {
+      var qIdx = SG_QUALITY_IDX[p.id];
+      return sum + (parseFloat((prior.data[p.id] || [])[qIdx]) || 0);
+    }, 0) : null;
+    var wowPct = prior && priorTotalQ > 0 ? ((totalQ - priorTotalQ) / priorTotalQ * 100).toFixed(0) : '--';
+    var wowColor = wowPct !== '--' ? (parseFloat(wowPct) > 0 ? 'var(--green)' : parseFloat(wowPct) < 0 ? 'var(--red)' : 'var(--text-muted)') : 'var(--text-muted)';
+    var topIdx = qualityCounts.indexOf(Math.max.apply(null, qualityCounts));
+    var topPlatform = SG_PLATFORMS[topIdx] ? SG_PLATFORMS[topIdx].name : '--';
+
+    // 10X progress
+    var totalGoal = SG_PLATFORMS.reduce(function(sum, p) { return sum + (sgBaseline[p.id] || 0) * 10; }, 0);
+    var tenxPct = totalGoal > 0 ? (totalQ / totalGoal * 100).toFixed(0) + '%' : '--';
+
+    rows += '<tr>';
+    rows += '<td>' + week.date + '</td>';
+    qualityCounts.forEach(function(q) { rows += '<td style="font-family:var(--mono);text-align:center">' + (q || '--') + '</td>'; });
+    rows += '<td style="font-family:var(--mono);font-weight:700;text-align:center">' + totalQ + '</td>';
+    rows += '<td style="color:' + wowColor + ';font-weight:700;text-align:center">' + (wowPct !== '--' ? (parseFloat(wowPct) > 0 ? '+' : '') + wowPct + '%' : '--') + '</td>';
+    rows += '<td style="text-align:center">' + tenxPct + '</td>';
+    rows += '<td>' + topPlatform + '</td>';
+    rows += '</tr>';
+  });
+  body.innerHTML = rows;
+}
+
+var SG_ANALYSIS_SYSTEM = 'You are a social media growth strategist for HueVine MedSpa. HueVine is a medspa in Southfield, MI that does laser hair removal, underarm resurfacing, peels, and beard facials, plus a product line. The Creative Director Celeste is trying to 10X the number of high-quality performing content pieces per week across Instagram, TikTok, YouTube, Pinterest, Facebook, Email, and SMS. High-quality means: saves, shares, bookings, meaningful engagement. When given weekly metrics data, provide a sharp, specific growth analysis in 4 parts: (1) BIGGEST WINS THIS WEEK - what to double down on (2) FASTEST PATH TO 10X - the 2-3 highest leverage moves specific to HueVine and what the data shows (3) ENGINE OPPORTUNITY - what content pattern should become a repeatable engine based on this data (4) ONE PRIORITY FOR NEXT WEEK - a single focused action. Be direct, specific to HueVine medspa business, no generic advice. Maximum 250 words total.';
+
+function sgAnalyze() {
+  var btn = document.getElementById('sg-analyze-btn');
+  var resultEl = document.getElementById('sg-analysis-result');
+  if (btn) btn.disabled = true;
+  if (resultEl) { resultEl.classList.remove('show'); resultEl.textContent = 'Analyzing growth data...'; resultEl.classList.add('show'); }
+
+  var weekData = sgWeeks.length > 0 ? sgWeeks[sgCurrentWeek] : null;
+  var working = (document.getElementById('sg-working') || {}).value || '';
+  var stop = (document.getElementById('sg-stop') || {}).value || '';
+  var engineOpp = (document.getElementById('sg-engine-opp') || {}).value || '';
+
+  var dataLines = [];
+  if (weekData) {
+    SG_PLATFORMS.forEach(function(p) {
+      var vals = weekData.data[p.id] || [];
+      var qIdx = SG_QUALITY_IDX[p.id];
+      var base = sgBaseline[p.id] || 0;
+      dataLines.push(p.name + ': quality pieces=' + (vals[qIdx] || 0) + ', baseline=' + base + ', 10X goal=' + (base * 10));
+    });
+  }
+  if (working) dataLines.push('What worked: ' + working);
+  if (stop) dataLines.push('What to stop: ' + stop);
+  if (engineOpp) dataLines.push('Engine opportunity spotted: ' + engineOpp);
+  if (sgWeeks.length > 1) {
+    var prior = sgWeeks[1];
+    var priLines = SG_PLATFORMS.map(function(p) {
+      var qIdx = SG_QUALITY_IDX[p.id];
+      return p.name + '=' + ((prior.data[p.id] || [])[qIdx] || 0);
+    });
+    dataLines.push('Prior week quality: ' + priLines.join(', '));
+  }
+
+  var userMsg = 'Weekly growth data for HueVine:\n\n' + dataLines.join('\n') + '\n\nProvide growth analysis.';
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1000,
+      system: SG_ANALYSIS_SYSTEM,
+      messages: [{ role: 'user', content: userMsg }]
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (btn) btn.disabled = false;
+    var text = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : 'No response.';
+    if (resultEl) {
+      resultEl.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      resultEl.classList.add('show');
+    }
+  })
+  .catch(function(err) {
+    if (btn) btn.disabled = false;
+    if (resultEl) { resultEl.textContent = 'Analysis failed: ' + err.message; }
+  });
+}
+
+// ════════════════════════════════════════
+// RESOURCE DROPS — Claude API Analysis
+// ════════════════════════════════════════
+var rdCurrentResult = null;
+
+var RD_SYSTEM = 'You are an AI systems analyst embedded inside the Celeste Creative Director Workspace for HueVine MedSpa (Southfield, MI). HueVine offers laser hair removal, underarm resurfacing, chemical peels, beard facials, and a product line including Power Gel, Purifying Pads, Ingrown Hair Annihilator, and Pro Series. The Creative Director (Celeste) produces content across Instagram, TikTok, YouTube Shorts, Pinterest, Email, and SMS. She builds repeatable content engines that turn one source input into multiple platform outputs. The automation stack is: n8n, Claude API, ChatGPT Images, Canva, Open Generative AI, Google Drive. Danielle (the owner) drops GitHub repos, tool URLs, YouTube links, or software names into this workspace and needs to know exactly what they are and what HueVine can do with them. You will analyze any resource and return ONLY a valid JSON object with these exact keys: what_is_this (string, plain language, 1-2 sentences), type (string, one of: GitHub Repo / AI Image Tool / Automation Tool / Design Tool / Video Tool / Analytics Tool / Scheduling Tool / CMS / Other), why_sent (string, why Danielle likely sent this, 1 sentence), huevine_application (string, 2-3 specific ways HueVine can use this for content, engines, or distribution), first_steps (string, exactly 3 numbered steps Celeste should take first), what_automates (string, what specific HueVine task this could automate), difficulty (string, one of: Easy / Medium / Complex), time_to_implement (string, realistic estimate), cost (string, one of: Free / Paid / API Cost / Free with paid tiers / Unknown), risk_flags (string, any licensing, brand, or security concerns, or None), engine_potential (string, which of the 7 HueVine content engines this could power, or New engine opportunity), recommendation (string, one of: Explore / Test / Add to Stack / Skip), recommendation_reason (string, one sentence why). Return ONLY the JSON object. No preamble, no markdown, no explanation.';
+
+function rdAnalyze() {
+  var urlEl = document.getElementById('rd-url');
+  var contextEl = document.getElementById('rd-context');
+  var btnEl = document.getElementById('rd-btn');
+  var thinkingEl = document.getElementById('rd-thinking');
+  var resultEl = document.getElementById('rd-result');
+  var url = urlEl ? urlEl.value.trim() : '';
+  var context = contextEl ? contextEl.value.trim() : '';
+  if (!url) { urlEl.focus(); return; }
+
+  if (btnEl) btnEl.disabled = true;
+  if (thinkingEl) thinkingEl.classList.add('show');
+  if (resultEl) resultEl.classList.remove('show');
+
+  var userMsg = 'Analyze this resource for HueVine: ' + url;
+  if (context) userMsg += '\n\nContext from Danielle: ' + context;
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1000,
+      system: RD_SYSTEM,
+      messages: [{ role: 'user', content: userMsg }]
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (thinkingEl) thinkingEl.classList.remove('show');
+    if (btnEl) btnEl.disabled = false;
+
+    var raw = '';
+    if (data.content && data.content[0] && data.content[0].text) {
+      raw = data.content[0].text.trim();
+    }
+    // Strip markdown fences if present
+    raw = raw.replace(/^```json\s*/,'').replace(/\s*```$/,'').trim();
+
+    var result;
+    try { result = JSON.parse(raw); } catch(e) {
+      result = {
+        what_is_this: raw || 'Could not parse response.',
+        type: 'Other', why_sent: '', huevine_application: '',
+        first_steps: '', what_automates: '', difficulty: 'Unknown',
+        time_to_implement: 'Unknown', cost: 'Unknown', risk_flags: 'None',
+        engine_potential: 'Unknown', recommendation: 'Explore', recommendation_reason: ''
+      };
+    }
+
+    rdCurrentResult = { url: url, context: context, result: result, date: new Date().toLocaleDateString() };
+    rdRenderResult(url, result);
+  })
+  .catch(function(err) {
+    if (thinkingEl) thinkingEl.classList.remove('show');
+    if (btnEl) btnEl.disabled = false;
+    rdRenderResult(url, { what_is_this: 'Analysis failed. Check your connection or API key.', type: 'Other', why_sent: '', huevine_application: '', first_steps: '', what_automates: '', difficulty: 'Unknown', time_to_implement: 'Unknown', cost: 'Unknown', risk_flags: 'None', engine_potential: 'Unknown', recommendation: 'Explore', recommendation_reason: err.message });
+  });
+}
+
+function rdRenderResult(url, r) {
+  var resultEl = document.getElementById('rd-result');
+  var titleEl = document.getElementById('rd-result-title');
+  var urlEl2 = document.getElementById('rd-result-url');
+  var fieldsEl = document.getElementById('rd-fields');
+  var recEl = document.getElementById('rd-rec');
+  var recValEl = document.getElementById('rd-rec-value');
+
+  if (titleEl) titleEl.textContent = r.what_is_this ? r.type || 'Resource Analysis' : 'Resource Analysis';
+  if (urlEl2) urlEl2.textContent = url;
+
+  var recBadgeClass = { 'Add to Stack': 'rd-badge-add', 'Test': 'rd-badge-test', 'Explore': 'rd-badge-explore', 'Skip': 'rd-badge-skip' }[r.recommendation] || 'rd-badge-explore';
+
+  var fields = [
+    { label: 'What Is This', value: r.what_is_this || '', full: true },
+    { label: 'Why Danielle Sent This', value: r.why_sent || '' },
+    { label: 'Type', value: r.type || '' },
+    { label: 'HueVine Application', value: r.huevine_application || '', full: true },
+    { label: 'First 3 Steps for Celeste', value: r.first_steps || '', full: true },
+    { label: 'What This Could Automate', value: r.what_automates || '' },
+    { label: 'Engine Potential', value: r.engine_potential || '' },
+    { label: 'Difficulty', value: r.difficulty || '' },
+    { label: 'Time to Implement', value: r.time_to_implement || '' },
+    { label: 'Cost', value: r.cost || '' },
+    { label: 'Risk Flags', value: r.risk_flags || 'None' }
+  ];
+
+  var html = '';
+  fields.forEach(function(f) {
+    html += '<div class="rd-field' + (f.full ? ' full' : '') + '">';
+    html += '<div class="rd-field-label">' + f.label + '</div>';
+    html += '<div class="rd-field-value">' + (f.value || '—') + '</div>';
+    html += '</div>';
+  });
+  if (fieldsEl) fieldsEl.innerHTML = html;
+
+  if (recEl) recEl.style.display = 'block';
+  if (recValEl) {
+    recValEl.innerHTML = '<span class="rd-badge ' + recBadgeClass + '">' + (r.recommendation || 'Explore') + '</span> ' + (r.recommendation_reason || '');
+  }
+
+  if (resultEl) resultEl.classList.add('show');
+}
+
+function rdSaveToLibrary() {
+  if (!rdCurrentResult) return;
+  var body = document.getElementById('rd-library-body');
+  if (!body) return;
+  var r = rdCurrentResult.result;
+  var statuses = ['To Review','Exploring','Testing','In Stack','Parked','Skipped'];
+  var tr = document.createElement('tr');
+  var recBadgeClass = { 'Add to Stack': 'rd-badge-add', 'Test': 'rd-badge-test', 'Explore': 'rd-badge-explore', 'Skip': 'rd-badge-skip' }[r.recommendation] || 'rd-badge-explore';
+
+  function mkTd(content, isHtml) {
+    var td = document.createElement('td');
+    if (isHtml) td.innerHTML = content;
+    else td.textContent = content || '';
+    return td;
+  }
+
+  tr.appendChild(mkTd(rdCurrentResult.url));
+  tr.appendChild(mkTd(r.type || ''));
+  tr.appendChild(mkTd(r.what_is_this || ''));
+  tr.appendChild(mkTd(r.huevine_application || ''));
+  tr.appendChild(mkTd('<span class="rd-badge ' + recBadgeClass + '">' + (r.recommendation || 'Explore') + '</span>', true));
+  tr.appendChild(mkTd(r.difficulty || ''));
+  tr.appendChild(mkTd(r.cost || ''));
+  tr.appendChild(mkTd(r.first_steps ? r.first_steps.split('\n')[0] : ''));
+  tr.appendChild(mkTd(r.engine_potential || ''));
+
+  var statusTd = document.createElement('td');
+  var sel = mkSelect(statuses, 'To Review');
+  statusTd.appendChild(sel);
+  tr.appendChild(statusTd);
+
+  tr.appendChild(mkTd(rdCurrentResult.date || ''));
+
+  var delTd = document.createElement('td'); delTd.appendChild(mkDelBtn()); tr.appendChild(delTd);
+  body.insertBefore(tr, body.firstChild);
+  autoSave();
+}
+
+function rdAddManualRow() {
+  var body = document.getElementById('rd-library-body');
+  if (!body) return;
+  var tr = document.createElement('tr');
+  var statuses = ['To Review','Exploring','Testing','In Stack','Parked','Skipped'];
+  var recs = ['Explore','Test','Add to Stack','Skip'];
+  appendCells(tr, [
+    mkInput('URL or tool name'), mkInput('Type'), mkInput('What is this'),
+    mkInput('HueVine application'), mkSelect(recs), mkInput('Difficulty'),
+    mkInput('Cost'), mkInput('First step'), mkInput('Engine potential'),
+    mkSelect(statuses), mkInput('Date')
+  ]);
+  body.insertBefore(tr, body.firstChild);
+  autoSave();
+}
+
+// Add rd-library-body to persistence
+TABLE_IDS.push('rd-library-body');
+ROW_ADDERS['rd-library-body'] = rdAddManualRow;
+
+// ════════════════════════════════════════
+// EVENT DELEGATION FOR AUTOSAVE
+// ════════════════════════════════════════
+document.addEventListener('change', function(e) {
+  if (e.target.matches('input,select,textarea')) autoSave();
+});
+document.addEventListener('input', function(e) {
+  if (e.target.matches('input,textarea')) {
+    clearTimeout(saveTimeout); saveTimeout = setTimeout(persistAll, 800);
+  }
+});
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+  loadTimerSessions();
+  restoreAll();
+  prjLoad();
+  sgLoad();
+  var engineLib = document.getElementById('engine-lib-body');
+  var autoEngines = document.getElementById('auto-engines-body');
+  if (engineLib && engineLib.querySelectorAll('tr').length === 0) seedStarterData();
+  else if (autoEngines && autoEngines.querySelectorAll('tr').length === 0) {
+    // Seed tools only if missing
+  }
+  var rptDate = document.getElementById('rpt-date');
+  if (rptDate && !rptDate.value) rptDate.value = new Date().toISOString().split('T')[0];
+  renderClock();
+  renderDashboard();
+});
+
+// ════════════════════════════════════════
+// PWA — SERVICE WORKER + INSTALL PROMPT
+// ════════════════════════════════════════
+var deferredInstallPrompt = null;
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js')
+      .then(function(reg) {
+        console.log('[Celeste OS] SW registered:', reg.scope);
+        reg.addEventListener('updatefound', function() {
+          var newSW = reg.installing;
+          newSW.addEventListener('statechange', function() {
+            if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+              showUpdateBanner();
+            }
+          });
+        });
+      })
+      .catch(function(err) { console.warn('[Celeste OS] SW failed:', err); });
+  });
+}
+
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  var installBtn = document.getElementById('pwa-install-btn');
+  if (installBtn) installBtn.style.display = 'flex';
+});
+
+window.addEventListener('appinstalled', function() {
+  var installBtn = document.getElementById('pwa-install-btn');
+  if (installBtn) installBtn.style.display = 'none';
+  deferredInstallPrompt = null;
+  console.log('[Celeste OS] App installed.');
+});
+
+function triggerInstall() {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then(function(choice) {
+    if (choice.outcome === 'accepted') {
+      var installBtn = document.getElementById('pwa-install-btn');
+      if (installBtn) installBtn.style.display = 'none';
+    }
+    deferredInstallPrompt = null;
+  });
+}
+
+function showUpdateBanner() {
+  var banner = document.createElement('div');
+  banner.style.cssText = 'position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--accent);border-radius:var(--r-lg);padding:12px 20px;display:flex;align-items:center;gap:12px;z-index:9999;font-size:13px;color:var(--text)';
+  banner.innerHTML = '<span>Celeste OS updated.</span><button onclick="window.location.reload()" style="padding:5px 12px;background:var(--accent);color:#fff;border:none;border-radius:var(--r);cursor:pointer;font-size:12px;font-weight:700">Reload</button><button onclick="this.parentNode.remove()" style="padding:5px 12px;background:var(--card-hi);border:1px solid var(--border);color:var(--text-muted);border-radius:var(--r);cursor:pointer;font-size:12px">Later</button>';
+  document.body.appendChild(banner);
+}
+
+
+// Offline detection
+window.addEventListener('online', function() {
+  var dot = document.querySelector('.pwa-offline-dot');
+  if (dot) dot.classList.remove('offline');
+});
+window.addEventListener('offline', function() {
+  var dot = document.querySelector('.pwa-offline-dot');
+  if (dot) dot.classList.add('offline');
+});
+
+// Handle deep link shortcuts: ?section=xxx
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var section = params.get('section');
+  if (section) {
+    window.addEventListener('DOMContentLoaded', function() {
+      showSection(section);
+    });
+  }
+})();
+</script>
+</body>
+</html>
