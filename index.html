@@ -245,11 +245,76 @@ textarea.fi{min-height:72px;resize:vertical;line-height:1.5}
 .sg-analysis-result{display:none;background:var(--card);border:1px solid var(--border);border-radius:var(--r-xl);padding:20px;margin-top:12px;font-size:13px;color:var(--text);line-height:1.7}
 .sg-analysis-result.show{display:block}
 .sg-history-table tbody tr td:first-child{font-family:var(--mono);font-size:12px;color:var(--text-muted)}
-@media(max-width:900px){
-  .sg-platform-grid{grid-template-columns:1fr}
-  .sg-10x-grid{grid-template-columns:repeat(2,1fr)}
-  .sg-ww-grid{grid-template-columns:1fr}
+
+/* ═══════════════════════════════════════
+   MOBILE PWA — Sidebar Drawer + Responsive
+   ═══════════════════════════════════════ */
+.ham-btn{display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px 8px;border-radius:var(--r);line-height:1;flex-shrink:0;align-items:center}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:199;backdrop-filter:blur(2px)}
+.sb-overlay.show{display:block}
+.sb-close-row{display:none;padding:12px 16px 0;justify-content:flex-end}
+.sb-close-btn{background:none;border:1px solid var(--border);color:var(--text-mid);padding:5px 12px;border-radius:var(--r);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)}
+
+@media(max-width:768px){
+  :root{--sb:0px;--hh:48px}
+  body{overflow:hidden}
+  #app{grid-template-columns:1fr !important;grid-template-rows:var(--hh) 1fr !important}
+  header{padding:0 12px;gap:8px}
+  .brand{font-size:13px;font-weight:700}
+  .focus-bar{display:none !important}
+  #pwa-install-btn{display:none !important}
+  .user-tag{display:none}
+  .ham-btn{display:flex}
+  nav#sidebar{
+    position:fixed;top:0;left:-260px;width:260px;height:100%;height:100dvh;
+    z-index:200;transition:left .28s cubic-bezier(.4,0,.2,1);
+    overflow-y:auto;box-shadow:6px 0 32px rgba(0,0,0,.5);padding-top:0
+  }
+  nav#sidebar.open{left:0}
+  .sb-close-row{display:flex}
+  .nav-item{padding:11px 18px;font-size:13px}
+  main{padding:14px !important;overflow-y:auto;-webkit-overflow-scrolling:touch;height:calc(100vh - var(--hh));height:calc(100dvh - var(--hh))}
+  .ph h1{font-size:17px}
+  .ph p{font-size:12px}
+  .tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r-lg)}
+  .tw table{min-width:580px}
+  .bento{display:flex !important;flex-direction:column !important;gap:8px}
+  .bento-item{min-height:70px}
+  .detail-cards{grid-template-columns:1fr !important}
+  .detail-card{padding:14px}
+  .action-row{flex-wrap:wrap;gap:6px}
+  .abtn{font-size:12px;padding:6px 12px}
+  .timer-display{font-size:52px !important}
+  .timer-presets,.timer-controls{flex-wrap:wrap;gap:6px}
+  .timer-btn{font-size:12px;padding:7px 12px}
+  .sg-goal-banner{flex-direction:column;align-items:flex-start}
+  .sg-10x-grid{grid-template-columns:1fr 1fr !important}
+  .sg-platform-grid{grid-template-columns:1fr !important}
+  .sg-ww-grid{grid-template-columns:1fr !important}
+  .sg-plat-fields{grid-template-columns:1fr !important}
+  .sg-plat-field{border-right:none !important}
+  .sg-week-tabs{flex-wrap:wrap}
+  .rd-url-row{flex-direction:column}
+  .rd-analyze-btn{width:100%;text-align:center}
+  .rd-fields{grid-template-columns:1fr !important}
+  .rd-field{border-right:none !important}
+  .rd-field.full{grid-column:1 !important}
+  .prj-header{flex-wrap:wrap;gap:6px}
+  .prj-meta{flex-wrap:wrap;gap:6px}
+  .prj-export-btns{flex-wrap:wrap}
+  .prj-fields{grid-template-columns:1fr !important}
+  .prj-add-task-row{flex-direction:column}
+  .prj-add-task-btn{width:100%}
+  .ww-grid{grid-template-columns:1fr !important}
+  footer{padding:16px !important;text-align:center}
+  .mandate{font-size:12px !important;padding:16px !important}
 }
+@media(max-width:420px){
+  .sg-10x-grid{grid-template-columns:1fr !important}
+  .timer-display{font-size:40px !important}
+  .ph h1{font-size:15px}
+}
+
 /* PROJECTS */
 .prj-grid{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
 .prj-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;transition:border-color .2s}
@@ -372,7 +437,7 @@ textarea.fi{min-height:72px;resize:vertical;line-height:1.5}
 
 <!-- HEADER -->
 <header>
-  <div class="brand">Celeste <em>/</em> HueVine</div>
+  <button class="ham-btn" id="ham-btn" onclick="toggleSidebar()" aria-label="Menu">&#9776;</button><div class="brand">Celeste <em>/</em> HueVine</div>
   <div class="focus-bar" id="focus-bar" onclick="showSection('focus')" title="Open Focus Timer">
     <span id="hdr-time">25:00</span>
     <span id="hdr-label">No active focus</span>
@@ -386,7 +451,9 @@ textarea.fi{min-height:72px;resize:vertical;line-height:1.5}
 </header>
 
 <!-- SIDEBAR -->
-<nav>
+<div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+<nav id="sidebar">
+  <div class="sb-close-row"><button class="sb-close-btn" onclick="closeSidebar()">✕ Close</button></div>
   <div class="nav-section-label">Command</div>
   <div class="nav-item active" onclick="showSection('dashboard')"><span class="nav-dot"></span>Dashboard</div>
   <div class="nav-item" onclick="showSection('top3')"><span class="nav-dot"></span>Today's Top 3</div>
@@ -395,7 +462,7 @@ textarea.fi{min-height:72px;resize:vertical;line-height:1.5}
   <div class="nav-item" onclick="showSection('projects')"><span class="nav-dot"></span>Projects</div>
   <div class="nav-rule"></div>
   <div class="nav-section-label">Intake &amp; Engines</div>
-  <div class="nav-item" onclick="showSection('slp')"><span class="nav-dot"></span>SLP Intake</div>
+  <div class="nav-item" onclick="showSection('sop')"><span class="nav-dot"></span>SOP Intake</div>
   <div class="nav-item" onclick="showSection('engine-builder')"><span class="nav-dot"></span>Engine Builder</div>
   <div class="nav-item" onclick="showSection('engine-library')"><span class="nav-dot"></span>Engine Library</div>
   <div class="nav-rule"></div>
@@ -628,20 +695,20 @@ textarea.fi{min-height:72px;resize:vertical;line-height:1.5}
   </div>
   <button class="add-btn" onclick="addQueueRow()">+ Add Task</button>
 </div>
-<div class="section" id="sec-slp">
+<div class="section" id="sec-sop">
   <div class="ph">
-    <h1>SLP Intake</h1>
-    <p>Danielle drops SLPs, briefs, and Drive links here for Celeste to action.</p>
+    <h1>SOP Intake</h1>
+    <p>Danielle drops SOPs, briefs, and Drive links here for Celeste to action.</p>
   </div>
   <div class="tw">
     <table>
       <thead><tr>
-        <th>SLP Name</th><th>Drive Link</th><th>Campaign</th><th>Source Type</th><th>Assets Needed</th><th>Work Type</th><th>Priority</th><th>Deadline</th><th>Missing Info</th><th>Ready?</th><th>Status</th><th>Become Engine?</th><th>Engine Type</th><th></th>
+        <th>SOP Name</th><th>Drive Link</th><th>Campaign</th><th>Source Type</th><th>Assets Needed</th><th>Work Type</th><th>Priority</th><th>Deadline</th><th>Missing Info</th><th>Ready?</th><th>Status</th><th>Become Engine?</th><th>Engine Type</th><th></th>
       </tr></thead>
-      <tbody id="slp-body"></tbody>
+      <tbody id="sop-body"></tbody>
     </table>
   </div>
-  <button class="add-btn" onclick="addSLPRow()">+ Add SLP</button>
+  <button class="add-btn" onclick="addSOPRow()">+ Add SOP</button>
 </div>
 <div class="section" id="sec-engine-builder">
   <div class="ph">
@@ -658,7 +725,7 @@ textarea.fi{min-height:72px;resize:vertical;line-height:1.5}
     </div>
     <div class="engine-starter" onclick="loadEngine(1)">
       <div class="es-name">Product Education Engine</div>
-      <div class="es-meta">Input: product SLP &rarr; graphic, reel script, caption, email, SMS, Pinterest pin</div>
+      <div class="es-meta">Input: product SOP &rarr; graphic, reel script, caption, email, SMS, Pinterest pin</div>
       <div class="es-action">Load into builder &rarr;</div>
     </div>
     <div class="engine-starter" onclick="loadEngine(2)">
@@ -683,7 +750,7 @@ textarea.fi{min-height:72px;resize:vertical;line-height:1.5}
     </div>
     <div class="engine-starter" onclick="loadEngine(6)">
       <div class="es-name">Campaign Kit Engine</div>
-      <div class="es-meta">Input: one campaign SLP &rarr; hero graphic, reel, stories, email, SMS, Pinterest, landing banner, CTA</div>
+      <div class="es-meta">Input: one campaign SOP &rarr; hero graphic, reel, stories, email, SMS, Pinterest, landing banner, CTA</div>
       <div class="es-action">Load into builder &rarr;</div>
     </div>
   </div>
@@ -698,7 +765,7 @@ textarea.fi{min-height:72px;resize:vertical;line-height:1.5}
         <div class="fg"><label class="fl">Last Tested</label><input class="fi" id="eb-tested" type="date"></div>
       </div>
       <div class="fg"><label class="fl">Goal</label><input class="fi" id="eb-goal" type="text" placeholder="What does this engine produce?"></div>
-      <div class="fg"><label class="fl">Source Input</label><textarea class="fi" id="eb-source" rows="2" placeholder="SLP, product, testimonial, transcript, graphic..."></textarea></div>
+      <div class="fg"><label class="fl">Source Input</label><textarea class="fi" id="eb-source" rows="2" placeholder="SOP, product, testimonial, transcript, graphic..."></textarea></div>
       <div class="fr">
         <div class="fg"><label class="fl">Audience</label><input class="fi" id="eb-audience" type="text" placeholder="Who is this for?"></div>
         <div class="fg"><label class="fl">Offer / Service / Product</label><input class="fi" id="eb-offer" type="text" placeholder="What is being promoted?"></div>
@@ -764,7 +831,7 @@ textarea.fi{min-height:72px;resize:vertical;line-height:1.5}
   <div class="tw">
     <table>
       <thead><tr>
-        <th>Automation Output</th><th>Source SLP</th><th>Engine Used</th><th>Output Type</th><th>Platform</th><th>Generated Link</th><th>Celeste Decision</th><th>Approved?</th><th>Needs Danielle?</th><th>Notes</th><th>Status</th><th></th>
+        <th>Automation Output</th><th>Source SOP</th><th>Engine Used</th><th>Output Type</th><th>Platform</th><th>Generated Link</th><th>Celeste Decision</th><th>Approved?</th><th>Needs Danielle?</th><th>Notes</th><th>Status</th><th></th>
       </tr></thead>
       <tbody id="auto-review-body"></tbody>
     </table>
@@ -828,7 +895,7 @@ textarea.fi{min-height:72px;resize:vertical;line-height:1.5}
       <div class="day-theme">Plan + Strategy</div>
       <div class="day-desc">Orient the week. Know what matters before producing anything.</div>
       <ul class="day-tasks">
-        <li>Review incoming SLPs from Danielle</li>
+        <li>Review incoming SOPs from Danielle</li>
         <li>Check platform metrics from prior week</li>
         <li>Set Today's Top 3 for the week</li>
         <li>Confirm automation vs original work split</li>
@@ -1192,7 +1259,7 @@ textarea.fi{min-height:72px;resize:vertical;line-height:1.5}
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
           <div style="padding:10px 12px;background:var(--surface);border-radius:var(--r);border-top:2px solid var(--blue)">
             <div style="font-size:11px;font-weight:800;color:var(--blue);margin-bottom:3px">TUESDAY</div>
-            <div style="font-size:12px;color:var(--text);font-weight:500">Plan week, review SLPs, check metrics, set Top 3</div>
+            <div style="font-size:12px;color:var(--text);font-weight:500">Plan week, review SOPs, check metrics, set Top 3</div>
           </div>
           <div style="padding:10px 12px;background:var(--surface);border-radius:var(--r);border-top:2px solid var(--green)">
             <div style="font-size:11px;font-weight:800;color:var(--green);margin-bottom:3px">WEDNESDAY</div>
@@ -1300,7 +1367,7 @@ textarea.fi{min-height:72px;resize:vertical;line-height:1.5}
         </div>
         <div style="padding:8px 10px;background:var(--surface);border-radius:var(--r);border-left:3px solid var(--gold)">
           <div style="font-size:11px;font-weight:800;color:var(--gold)">CAMPAIGN KIT</div>
-          <div style="font-size:11px;color:var(--text-mid);margin-top:1px;font-weight:500">One campaign SLP → full asset kit across all channels</div>
+          <div style="font-size:11px;color:var(--text-mid);margin-top:1px;font-weight:500">One campaign SOP → full asset kit across all channels</div>
         </div>
       </div>
     </div>
@@ -1322,7 +1389,7 @@ textarea.fi{min-height:72px;resize:vertical;line-height:1.5}
 // ════════════════════════════════════════
 var SEC_MAP = {
   dashboard:'sec-dashboard', top3:'sec-top3', focus:'sec-focus', queue:'sec-queue',
-  slp:'sec-slp', 'engine-builder':'sec-engine-builder', 'engine-library':'sec-engine-library',
+  sop:'sec-sop', 'engine-builder':'sec-engine-builder', 'engine-library':'sec-engine-library',
   'auto-engines':'sec-auto-engines', 'auto-review':'sec-auto-review', publish:'sec-publish',
   metrics:'sec-metrics', archive:'sec-archive', timeblocks:'sec-timeblocks',
   report:'sec-report', danielle:'sec-danielle', 'resource-drops':'sec-resource-drops', 'social-growth':'sec-social-growth', 'how-to-use':'sec-how-to-use', 'projects':'sec-projects'
@@ -1555,13 +1622,13 @@ function addQueueRow() {
   body.appendChild(tr); autoSave();
 }
 
-function addSLPRow() {
-  var body = document.getElementById('slp-body');
+function addSOPRow() {
+  var body = document.getElementById('sop-body');
   var tr = document.createElement('tr');
-  var sourceTypes = ['SLP','Product','Service','Event','Testimonial','Client Proof','Video','Idea','Existing Graphic'];
+  var sourceTypes = ['SOP','Product','Service','Event','Testimonial','Client Proof','Video','Idea','Existing Graphic'];
   var statuses = ['Pending','In Review','Ready','Assigned','Complete'];
   appendCells(tr, [
-    mkInput('SLP name'), mkInput('Drive link'), mkInput('Campaign'), mkSelect(sourceTypes),
+    mkInput('SOP name'), mkInput('Drive link'), mkInput('Campaign'), mkSelect(sourceTypes),
     mkInput('Assets needed'), mkSelect(WORK_TYPES), mkSelect(PRIORITIES), mkInput('Deadline'),
     mkInput('Missing info'), mkSelect(YES_NO), mkSelect(statuses), mkSelect(YES_NO), mkInput('Engine type')
   ]);
@@ -1612,7 +1679,7 @@ function addAutoReviewRow() {
   var decisions = ['Pending','Approved','Needs Edit','Regenerate','Hold','Send to Danielle','Ready to Schedule','Ready to Publish','Park This'];
   var statuses = ['Pending Review','In Review','Approved','Rejected','Scheduled','Published'];
   appendCells(tr, [
-    mkInput('Output name'), mkInput('Source SLP'), mkInput('Engine used'),
+    mkInput('Output name'), mkInput('Source SOP'), mkInput('Engine used'),
     mkSelect(outTypes), mkSelect(PLATFORMS), mkInput('Generated link'),
     mkSelect(decisions), mkSelect(YES_NO), mkSelect(YES_NO), mkInput('Notes'), mkSelect(statuses)
   ]);
@@ -1693,7 +1760,7 @@ var STARTER_ENGINES = [
   },
   {
     name: 'Product Education Engine',
-    source: 'Product SLP or product fact sheet',
+    source: 'Product SOP or product fact sheet',
     goal: 'Educate audience about HueVine products and drive product page visits and sales',
     audience: 'Current and prospective HueVine clients',
     offer: 'Power Gel, Purifying Pads, Ingrown Hair Annihilator, Pro Series',
@@ -1763,7 +1830,7 @@ var STARTER_ENGINES = [
   },
   {
     name: 'Campaign Kit Engine',
-    source: 'One campaign SLP',
+    source: 'One campaign SOP',
     goal: 'Produce a complete visual and copy kit for any HueVine campaign from one brief',
     audience: 'All HueVine audiences across all platforms',
     offer: 'Campaign-specific offer or service',
@@ -1773,7 +1840,7 @@ var STARTER_ENGINES = [
     metrics: 'Campaign completion, clicks, bookings, sales signal',
     decision: 'Pending',
     status: 'Idea',
-    notes: 'Goal: one SLP in, full campaign kit out. Test with next major campaign.'
+    notes: 'Goal: one SOP in, full campaign kit out. Test with next major campaign.'
   }
 ];
 
@@ -1842,7 +1909,7 @@ function flashSave() {
   setTimeout(function() { dot.classList.remove('show'); }, 2000);
 }
 
-var TABLE_IDS = ['top3-body','queue-body','slp-body','engine-lib-body','auto-engines-body','auto-review-body','publish-body','metrics-body','archive-body','danielle-body','session-log'];
+var TABLE_IDS = ['top3-body','queue-body','sop-body','engine-lib-body','auto-engines-body','auto-review-body','publish-body','metrics-body','archive-body','danielle-body','session-log'];
 
 function persistAll() {
   TABLE_IDS.forEach(function(id) {
@@ -1864,7 +1931,7 @@ function persistAll() {
 }
 
 var ROW_ADDERS = {
-  'top3-body': addTop3Row, 'queue-body': addQueueRow, 'slp-body': addSLPRow,
+  'top3-body': addTop3Row, 'queue-body': addQueueRow, 'sop-body': addSOPRow,
   'engine-lib-body': function() { addEngineLibRow({}); },
   'auto-engines-body': function() { addAutoEngineRow({}); },
   'auto-review-body': addAutoReviewRow, 'publish-body': addPublishRow,
@@ -1909,11 +1976,11 @@ function seedStarterData() {
   // Pre-load automation tools
   var tools = [
     { name: 'Open Generative AI', type: 'Open Generative AI', purpose: 'AI image generation for HueVine branded visuals', useCase: 'Illustration style engine, product visuals, campaign graphics', status: 'Researching', cost: 'Unknown', license: 'Review commercial use terms before production use', setup: 'Research license options before first production use', secRisk: 'Low', brandRisk: 'Medium', reviewReq: 'Yes', owner: 'Celeste', next: 'Review license options and test with one illustration' },
-    { name: 'n8n MuAPI Nodes', type: 'n8n Workflow', link: '', purpose: 'Automate content distribution and data routing', useCase: 'Caption automation, metric collection, SLP routing, asset delivery', status: 'Testing', cost: 'API Cost', license: 'Open source n8n, MuAPI commercial license required', setup: 'Contact Danielle for n8n credentials', secRisk: 'Low', brandRisk: 'Low', reviewReq: 'Yes', owner: 'Danielle', next: 'Get n8n access from Danielle' },
+    { name: 'n8n MuAPI Nodes', type: 'n8n Workflow', link: '', purpose: 'Automate content distribution and data routing', useCase: 'Caption automation, metric collection, SOP routing, asset delivery', status: 'Testing', cost: 'API Cost', license: 'Open source n8n, MuAPI commercial license required', setup: 'Contact Danielle for n8n credentials', secRisk: 'Low', brandRisk: 'Low', reviewReq: 'Yes', owner: 'Danielle', next: 'Get n8n access from Danielle' },
     { name: 'ChatGPT Images / OpenAI Image API', type: 'ChatGPT Images', link: 'https://platform.openai.com', purpose: 'AI-generated product and service visuals', useCase: 'Product Education Engine, Illustration Style Engine, Campaign Kit Engine', status: 'Testing', cost: 'API Cost', license: 'OpenAI commercial use allowed per TOS', setup: 'API key from Danielle', secRisk: 'Low', brandRisk: 'Medium', reviewReq: 'Yes', owner: 'Celeste', next: 'Test with one product visual for Power Gel' },
-    { name: 'Claude Code', type: 'Claude Code', link: 'https://claude.ai', purpose: 'Automate prompt-to-output workflows and engine building', useCase: 'Engine building, SLP processing, content batch generation, workspace management', status: 'Working', cost: 'API Cost', license: 'Anthropic commercial use allowed', setup: 'Active via OkLetsWork account', secRisk: 'Low', brandRisk: 'Low', reviewReq: 'Yes', owner: 'Danielle', next: 'Use for next engine build session' },
+    { name: 'Claude Code', type: 'Claude Code', link: 'https://claude.ai', purpose: 'Automate prompt-to-output workflows and engine building', useCase: 'Engine building, SOP processing, content batch generation, workspace management', status: 'Working', cost: 'API Cost', license: 'Anthropic commercial use allowed', setup: 'Active via OkLetsWork account', secRisk: 'Low', brandRisk: 'Low', reviewReq: 'Yes', owner: 'Danielle', next: 'Use for next engine build session' },
     { name: 'Canva', type: 'Canva', link: 'https://canva.com', purpose: 'Brand-safe graphic design and template management', useCase: 'All graphic outputs, template bank, illustration modifications, campaign kits', status: 'Working', cost: 'Paid', license: 'Canva Pro commercial license active', setup: 'Login with HueVine account', secRisk: 'None', brandRisk: 'Low', reviewReq: 'No', owner: 'Celeste', next: 'Continue using for all graphics' },
-    { name: 'Google Drive', type: 'Other', link: 'https://drive.google.com', purpose: 'SLP storage, asset library, Danielle-to-Celeste file transfer', useCase: 'SLP intake, asset storage, shared brief delivery', status: 'Working', cost: 'Free', license: 'Google Workspace included', setup: 'Already active', secRisk: 'None', brandRisk: 'None', reviewReq: 'No', owner: 'Both', next: 'Continue using for all SLP transfers' },
+    { name: 'Google Drive', type: 'Other', link: 'https://drive.google.com', purpose: 'SOP storage, asset library, Danielle-to-Celeste file transfer', useCase: 'SOP intake, asset storage, shared brief delivery', status: 'Working', cost: 'Free', license: 'Google Workspace included', setup: 'Already active', secRisk: 'None', brandRisk: 'None', reviewReq: 'No', owner: 'Both', next: 'Continue using for all SOP transfers' },
     { name: 'Social Platform Metrics Exports', type: 'Other', link: '', purpose: 'Pull weekly platform data for metrics review and engine decisions', useCase: 'Metrics + Next Moves, Metrics-to-Next-Batch Engine', status: 'Working', cost: 'Free', license: 'Native platform exports', setup: 'Manual weekly export from each platform', secRisk: 'None', brandRisk: 'None', reviewReq: 'No', owner: 'Celeste', next: 'Set up Friday metrics review routine' }
   ];
   tools.forEach(function(t) { addAutoEngineRow(t); });
@@ -1966,6 +2033,40 @@ function renderDashboard() {
   var ds = document.getElementById('dash-sessions'); if (ds) ds.textContent = T.sessions;
   var dw = document.getElementById('dash-week-done'); if (dw) dw.textContent = queueWeekDone;
 }
+
+// ════════════════════════════════════════
+// MOBILE SIDEBAR TOGGLE
+// ════════════════════════════════════════
+function toggleSidebar() {
+  var nav = document.getElementById('sidebar');
+  var overlay = document.getElementById('sb-overlay');
+  if (!nav) return;
+  var isOpen = nav.classList.contains('open');
+  if (isOpen) {
+    nav.classList.remove('open');
+    if (overlay) overlay.classList.remove('show');
+    document.body.style.overflow = '';
+  } else {
+    nav.classList.add('open');
+    if (overlay) overlay.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeSidebar() {
+  var nav = document.getElementById('sidebar');
+  var overlay = document.getElementById('sb-overlay');
+  if (nav) nav.classList.remove('open');
+  if (overlay) overlay.classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+// Patch showSection to close sidebar on mobile
+var _origShowSection = showSection;
+showSection = function(id) {
+  _origShowSection(id);
+  if (window.innerWidth <= 768) closeSidebar();
+};
 
 // ════════════════════════════════════════
 // PROJECTS — Task Boards + Claude Code / Cursor Export
@@ -2209,8 +2310,8 @@ function prjRenderAll() {
     html += '<div class="prj-field-wrap"><div class="prj-field-label">Final Asset Link</div>';
     html += '<input class="prj-field-input" value="' + (prj.assetLink || '').replace(/"/g,'&quot;') + '" placeholder="Canva, Drive, Figma..." onchange="prjUpdateField(\'' + prj.id + '\',\'assetLink\',this.value)"></div>';
     // Drive Link
-    html += '<div class="prj-field-wrap"><div class="prj-field-label">Google Drive / SLP Link</div>';
-    html += '<input class="prj-field-input" value="' + (prj.driveLink || '').replace(/"/g,'&quot;') + '" placeholder="Source doc, brief, SLP..." onchange="prjUpdateField(\'' + prj.id + '\',\'driveLink\',this.value)"></div>';
+    html += '<div class="prj-field-wrap"><div class="prj-field-label">Google Drive / SOP Link</div>';
+    html += '<input class="prj-field-input" value="' + (prj.driveLink || '').replace(/"/g,'&quot;') + '" placeholder="Source doc, brief, SOP..." onchange="prjUpdateField(\'' + prj.id + '\',\'driveLink\',this.value)"></div>';
     // Notes
     html += '<div class="prj-field-wrap"><div class="prj-field-label">Notes</div>';
     html += '<input class="prj-field-input" value="' + (prj.notes || '').replace(/"/g,'&quot;') + '" placeholder="Context, blockers, ideas..." onchange="prjUpdateField(\'' + prj.id + '\',\'notes\',this.value)"></div>';
@@ -2292,7 +2393,7 @@ function prjExport(id, target) {
     if (taskLines) { prompt += taskLines + '\n'; }
     else { prompt += 'No tasks defined yet.\n\n'; }
     if (prj.assetLink) { prompt += '## Final Asset\n' + prj.assetLink + '\n\n'; }
-    if (prj.driveLink) { prompt += '## Source / SLP\n' + prj.driveLink + '\n\n'; }
+    if (prj.driveLink) { prompt += '## Source / SOP\n' + prj.driveLink + '\n\n'; }
     if (prj.notes) { prompt += '## Notes\n' + prj.notes + '\n\n'; }
     prompt += '---\n';
     prompt += 'Please help me complete the open tasks above for this HueVine creative project. ';
@@ -2321,7 +2422,7 @@ function prjExport(id, target) {
       prompt += '### Done: ' + doneTasks.length + ' completed\n\n';
     }
     if (prj.assetLink) { prompt += '## Final Asset Link\n' + prj.assetLink + '\n\n'; }
-    if (prj.driveLink) { prompt += '## Source / SLP Link\n' + prj.driveLink + '\n\n'; }
+    if (prj.driveLink) { prompt += '## Source / SOP Link\n' + prj.driveLink + '\n\n'; }
     if (prj.notes) { prompt += '## Notes\n' + prj.notes + '\n\n'; }
     prompt += '## Context\n';
     prompt += 'HueVine MedSpa, Southfield MI. Services: laser hair removal, underarm resurfacing, chemical peels, beard facials.\n';
